@@ -16,10 +16,12 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 
 		private static final long serialVersionUID = 1L;
 
+                @Override
 		public boolean isInProgress() {
 			return false;
 		}
 
+                @Override
 		public void undo() throws CannotUndoException {
 			if (compoundEdit != null)
 				compoundEdit.end();
@@ -28,23 +30,27 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 		}
 	}
 
+        @SuppressWarnings("LeakingThisInConstructor")
 	public CompoundUndoManager(JTextComponent editor) {
 		this.editor = editor;
 		editor.getDocument().addUndoableEditListener(this);
 	}
 
+        @Override
 	public void undo() {
 		editor.getDocument().addDocumentListener(this);
 		super.undo();
 		editor.getDocument().removeDocumentListener(this);
 	}
 
+        @Override
 	public void redo() {
 		editor.getDocument().addDocumentListener(this);
 		super.redo();
 		editor.getDocument().removeDocumentListener(this);
 	}
 
+        @Override
 	public void undoableEditHappened(UndoableEditEvent e) {
 		if (compoundEdit == null) {
 			compoundEdit = startCompoundEdit(e.getEdit());
@@ -62,11 +68,11 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 			compoundEdit.addEdit(e.getEdit());
 			lastOffset = editor.getCaretPosition();
 			lastLength = editor.getDocument().getLength();
-			return;
+			//return;
 		} else {
 			compoundEdit.end();
 			compoundEdit = startCompoundEdit(e.getEdit());
-			return;
+			//return;
 		}
 	}
 
@@ -79,9 +85,11 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 		return compoundEdit;
 	}
 
+        @Override
 	public void insertUpdate(final DocumentEvent e) {
 		SwingUtilities.invokeLater(new Runnable() {
 
+          @Override
 			public void run() {
 				int offset = e.getOffset() + e.getLength();
 				offset = Math.min(offset, editor.getDocument().getLength());
@@ -90,6 +98,7 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 		});
 	}
 
+        @Override
 	public void removeUpdate(DocumentEvent e) {
 		editor.setCaretPosition(e.getOffset());
 	}
@@ -102,6 +111,7 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 		editor.getDocument().addUndoableEditListener(this);
 	}
 
+        @Override
 	public void changedUpdate(DocumentEvent documentevent) {
 	}
 	
@@ -111,7 +121,7 @@ public class CompoundUndoManager extends UndoManager implements UndoableEditList
 
 	private static final long serialVersionUID = 1L;
 	public CompoundEdit compoundEdit;
-	private JTextComponent editor;
+	private final JTextComponent editor;
 	private int lastOffset;
 	private int lastLength;
 
