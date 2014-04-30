@@ -1,5 +1,15 @@
 package de.FBEditor;
 
+import de.FBEditor.struct.CompoundUndoManager;
+import de.FBEditor.struct.ExampleFileFilter;
+import de.FBEditor.struct.JTextPane2;
+import de.FBEditor.struct.MyProperties;
+import de.FBEditor.struct.OverwriteCaret;
+import de.FBEditor.utils.CalcChecksum;
+import de.FBEditor.utils.Debug;
+import de.FBEditor.utils.Encryption;
+import de.FBEditor.utils.Listener;
+import de.FBEditor.utils.Utils;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -18,7 +28,6 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -34,21 +43,10 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotRedoException;
 
-import de.FBEditor.struct.CompoundUndoManager;
-import de.FBEditor.struct.ExampleFileFilter;
-import de.FBEditor.struct.JTextPane2;
-import de.FBEditor.struct.MyProperties;
-import de.FBEditor.struct.OverwriteCaret;
-import de.FBEditor.utils.CalcChecksum;
-import de.FBEditor.utils.Debug;
-import de.FBEditor.utils.Encryption;
-import de.FBEditor.utils.Listener;
-import de.FBEditor.utils.Utils;
-
-public class FBEdit extends JFrame implements Runnable
+public final class FBEdit extends JFrame implements Runnable
 
 {
-	private static final String version = "0.7.2";
+	private static final String version = "0.7.0.5";
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
 	public static FritzBoxConnection fbConnection = null;
@@ -64,18 +62,20 @@ public class FBEdit extends JFrame implements Runnable
 	private static String box_address = "";
 	private static String box_password = "";
 	private static String box_username = "";
+	private static String box_ConfigImExPwd = "";
+	private static boolean box_isConfigImExPwdOk = false;
 	private static String readOnStartup = "false";
 	private static String NoChecks = "false";
 	private static String language = "false";
 
 	private static MyProperties properties;
 	private final CompoundUndoManager undoManager;
-	private static String progName = "Fritz!Box Export Editor";
+	private static final String progName = "Fritz!Box Export Editor";
 	private String fileName = "";
 	private boolean stoprequested = false;
 	private static CutAndPastePopup cutAndPaste;
-	private ActionListen action;
-	private MyMenu myMenu;
+	private final ActionListen action;
+	private final MyMenu myMenu;
 	private static boolean insertMode = true;
 
 	private static DocumentListener docListen;
@@ -87,6 +87,7 @@ public class FBEdit extends JFrame implements Runnable
 	private static ResourceBundle messages;
 	private static ResourceBundle en_messages;
 
+        @SuppressWarnings("IncompatibleEquals")
 	public FBEdit() {
 		
 		String jvm_version = System.getProperty("java.version");
@@ -107,6 +108,8 @@ public class FBEdit extends JFrame implements Runnable
 			System.out.println("position_left: " + position_left);
 			System.out.println("position_height: " + position_height);
 			System.out.println("position_width: " + position_width);
+
+			box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
 
 			setLocation(Integer.parseInt(position_left.trim()),
 					Integer.parseInt(position_top.trim()));
@@ -153,17 +156,15 @@ public class FBEdit extends JFrame implements Runnable
 		
 		Debug.always("Java version: " + jvm_version);
 
-		Font font = null;
+		//Font font = null;
+                Font font;
 		try {
 			font = Font.createFont( Font.TRUETYPE_FONT, getClass().getResourceAsStream( "/de/FBEditor/font/Consola.ttf") );
 			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont( font );
 			System.out.println("Font: : " + font.getName());
-		} catch (FontFormatException e) {
+		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 		if (!(loadProp)) {
@@ -209,6 +210,8 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	// Dateiname im Titel und Cursor Position setzen
+        @SuppressWarnings("SleepWhileInLoop")
+        @Override
 	public void run() {
 		while (!stoprequested) {
 			updateTitle();
@@ -249,10 +252,10 @@ public class FBEdit extends JFrame implements Runnable
 				undoManager.redo();
 			pane.requestFocus();
 		} catch (CannotRedoException cre) {
-			cre.printStackTrace();
+			//cre.printStackTrace();
 		}
 		updateMenu(myMenu);
-		return;
+		//return;
 	}
 
 	public JTextComponent getEditor() {
@@ -296,6 +299,8 @@ public class FBEdit extends JFrame implements Runnable
 		JTextPane2 pane2 = this.getJTextPane();
 
 		pane2.setText("");
+// Consolas Font Pack for Microsoft Visual Studio 2005 or 2008
+// Download: http://www.microsoft.com/en-us/download/details.aspx?id=17879
 		pane2.setFont(new Font("Consolas", 0, 12));
 		pane2.setEditable(false);
 		undoManager.pause();
@@ -324,7 +329,8 @@ public class FBEdit extends JFrame implements Runnable
 							+ text.substring(index);
 					text = CalcChecksum.replaceChecksum(text); // Neue Checksumme mit NoChecks
 				}
-				boolean result = false;
+				//boolean result = false;
+				boolean result;
 				result = Utils.exportData(getframe(), getbox_address(), text);
 				if (result)
 					JOptionPane.showMessageDialog(this,
@@ -351,11 +357,11 @@ public class FBEdit extends JFrame implements Runnable
 			fileName = chooser.getSelectedFile().getName();
 			jFile = chooser.getSelectedFile().getAbsolutePath();
 			try {
-				FileInputStream fis = new FileInputStream(jFile);
-				byte[] donnees = new byte[fis.available()];
-				fis.read(donnees);
-				setData(new String(donnees));
-				fis.close();
+                         try (FileInputStream fis = new FileInputStream(jFile)) {
+                          byte[] donnees = new byte[fis.available()];
+                          fis.read(donnees);
+                          setData(new String(donnees));
+                         }
 			} catch (IOException e) {
 				pane2.setText(FBEdit.getMessage("export.load.error"));
 			}
@@ -383,11 +389,11 @@ public class FBEdit extends JFrame implements Runnable
     		jFile = chooser.getSelectedFile().getAbsolutePath();
 
 	    	try {
-		    	FileOutputStream fos = new FileOutputStream(jFile);
-    			PrintStream pfos = new PrintStream(fos);
-	    		String text = CalcChecksum.replaceChecksum(pane2.getText());
-    			pfos.print(text);
-	    		fos.close();
+                 try (FileOutputStream fos = new FileOutputStream(jFile)) {
+                  PrintStream pfos = new PrintStream(fos);
+                  String text = CalcChecksum.replaceChecksum(pane2.getText());
+                  pfos.print(text);
+                 }
     		} catch (IOException e) {
 	    		JOptionPane.showMessageDialog(this.getframe(),
 		    			FBEdit.getMessage("export.save.error"),
@@ -397,12 +403,23 @@ public class FBEdit extends JFrame implements Runnable
 
 		}
 	}
-
+/*
+*	void about() {
+*		JOptionPane.showMessageDialog(
+*				this,
+*				(new StringBuilder("Fritz!Box Export Editor ")).append(version)
+*						.append("\n").append("by Oliver Metz\n\n")
+*						.append(FBEdit.getMessage("main.thanks")).toString(),
+*				FBEdit.getMessage("menu.about"), 0, new ImageIcon(
+*						getImageFromJAR("/icon.gif")));
+*	}
+*/
 	void about() {
 		JOptionPane.showMessageDialog(
 				this,
 				(new StringBuilder("Fritz!Box Export Editor ")).append(version)
-						.append("\n").append("by Oliver Metz\n\n")
+                                        .append("\n").append("NetBeans 8 Java 1.7 by Pikachu\n")
+                                        .append("\n").append("by Oliver Metz\n\n")
 						.append(FBEdit.getMessage("main.thanks")).toString(),
 				FBEdit.getMessage("menu.about"), 0, new ImageIcon(
 						getImageFromJAR("/icon.gif")));
@@ -451,6 +468,29 @@ public class FBEdit extends JFrame implements Runnable
 			makeNewConnection(first);
 	}
 
+	public void getConfigImExPwd(boolean first) {
+		String new_box_ConfigImExPwd = JOptionPane.showInputDialog(this,
+				FBEdit.getMessage("settings.ConfigImExPwd"), box_ConfigImExPwd);
+		if (new_box_ConfigImExPwd != null && !new_box_ConfigImExPwd.equals(box_ConfigImExPwd)) {
+			box_ConfigImExPwd = new_box_ConfigImExPwd;
+		}
+		
+		if (new_box_ConfigImExPwd != null) {
+			//box_isConfigImExPwdOk = true;
+			setConfigImExPwdOk(true);
+			System.out.println("new_box_ConfigImExPwd true: " + isConfigImExPwdOk());
+	    } else if (new_box_ConfigImExPwd == null) {	
+                //box_isConfigImExPwdOk = false;
+	    	setConfigImExPwdOk(false);
+	        System.out.println("new_box_ConfigImExPwd false: " + isConfigImExPwdOk());
+	    }
+
+		System.out.println("new_box_ConfigImExPwd: " + new_box_ConfigImExPwd + " -> " + isConfigImExPwdOk());
+
+		if (!first)
+			setbox_ConfigImExPwd(box_ConfigImExPwd);
+	}
+
 	public void enableMenu(boolean bool) {
 		// After settings restore only reconnect is allowed
 		myMenu.hardmenu.setEnabled(bool);
@@ -472,12 +512,12 @@ public class FBEdit extends JFrame implements Runnable
 		return INSTANCE;
 	}
 
-       private static void sleep(long millis) {
-               try {
- 			Thread.sleep(millis);
-               } catch (InterruptedException ignored) {
-               }
-       }       
+	private static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException ignored) {
+		}
+	}       
 
 	public static void main(String[] s) {
 		FBEdit fbedit = new FBEdit();
@@ -532,9 +572,26 @@ public class FBEdit extends JFrame implements Runnable
 	public String getbox_password() {
 		return box_password;
 	}
-	
+
 	public String getbox_username() {
 		return box_username;
+	}
+
+	public void setbox_ConfigImExPwd(String boxConfigImExPwd) {
+	    box_ConfigImExPwd = boxConfigImExPwd;
+	    properties.setProperty("box.ConfigImExPwd", box_ConfigImExPwd);
+	    System.out.println("Set box.ConfigImExPwd: " + box_ConfigImExPwd);
+	}
+
+	public String getbox_ConfigImExPwd() {
+		return box_ConfigImExPwd;
+	}
+	public static boolean isConfigImExPwdOk() {
+		return box_isConfigImExPwdOk;
+	}
+
+	public static void setConfigImExPwdOk(boolean ConfigImExPwdOk) {
+		box_isConfigImExPwdOk = ConfigImExPwdOk;
 	}
 
 	public MyMenu getMenu() {
@@ -668,7 +725,8 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	private static void loadLanguages() {
-		supported_languages = new Vector<Locale>();
+		//supported_languages = new Vector<Locale>();
+		supported_languages = new Vector<>();
 		supported_languages.add(new Locale("de", "DE"));
 		supported_languages.add(new Locale("en", "US"));
 		supported_languages.add(new Locale("es", "ES"));
@@ -702,10 +760,13 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	/**
+         * @param msg
 	 * @return Returns an internationalized message.
 	 */
 	public static String getMessage(String msg) {
-		String i18n = ""; //$NON-NLS-1$
+		//@SuppressWarnings("UnusedAssignment")
+		//String i18n = ""; //$NON-NLS-1$
+		String i18n; //$NON-NLS-1$
 		try {
 			if (!messages.getString(msg).equals("")) {
 				i18n = messages.getString(msg);
