@@ -9,15 +9,18 @@ class EditMenuListener implements MenuListener {
 		this.fbedit = fbedit;
 	}
 
+        @Override
 	public void menuSelected(MenuEvent e) {
 		fbedit.updateMenu(fbedit.getMenu());
 	}
 
+        @Override
 	public void menuCanceled(MenuEvent menuevent) {
 	}
 
+        @Override
 	public void menuDeselected(MenuEvent menuevent) {
 	}
 
-	private FBEdit fbedit;
+	private final FBEdit fbedit;
 }
