@@ -4,15 +4,15 @@
  */
 package de.FBEditor.utils;
 
-
+//import de.FBEditor.utils.LogSeverity;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -46,7 +46,7 @@ public class Debug {
 
 	private static PrintStream fileRedirecter, originalOut;
 	
-	private static JPanel main_panel = null;
+	private static final JPanel main_panel = null;
 
 	private static JTextArea log_area; 
 	
@@ -55,6 +55,9 @@ public class Debug {
 	private static JButton refresh_button;
 	private static JComboBox log_severity_box;
 
+        //public Debug() {
+	//}
+        
 	/**
 	 * Turns debug-mode on
 	 * 
@@ -71,7 +74,7 @@ public class Debug {
 	 * 
 	 * Turn on logging mode to file
 	 * 
-	 * @param fname
+	 * @param fName
 	 *            Filename to log into
 	 */
 	public static void logToFile(final String fName) {
@@ -89,7 +92,7 @@ public class Debug {
 			System.setErr(fileRedirecter);
 		}
 
-		catch (Exception e) {
+		catch (FileNotFoundException e) {
 			System.err.println("EXCEPTION when writing to LOGFILE"); //$NON-NLS-1$ 
 		}
 	}
@@ -129,7 +132,7 @@ public class Debug {
 	 * This is a modified message function, used by the network subsystem
 	 * so the debug output is more readable
 	 * 
-	 * @param message
+	 * @param msg
 	 */
 	public static void netMsg(final String msg){
 		msg(LS_NETWORK, msg);		
@@ -162,7 +165,8 @@ public class Debug {
 			log_area.setText("");
 			@SuppressWarnings("resource")
 			BufferedReader in = new BufferedReader(new FileReader(debugLogFile));
-			String zeile = null;
+			//String zeile = null;
+                        String zeile;
 			while ((zeile = in.readLine()) != null) {
 				if (selectedLogSeverity.getId() >= returnLineSeverity(zeile).getId())
 				{
@@ -170,12 +174,13 @@ public class Debug {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
 	private static LogSeverity returnLineSeverity(String line)
 	{
+                @SuppressWarnings("UnusedAssignment")
 		LogSeverity ls = LS_DEBUG;
 		if (line.substring(19).startsWith(LS_DEBUG.getPrefix())) {
 			ls = LS_DEBUG;			
