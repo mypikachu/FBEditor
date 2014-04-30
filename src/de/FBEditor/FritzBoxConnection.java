@@ -1,22 +1,21 @@
 package de.FBEditor;
 
+import de.FBEditor.struct.FBFWVN;
+import de.FBEditor.struct.HttpPost;
+import de.FBEditor.struct.SIDLogin;
+import de.FBEditor.struct.FbQueryLua;
+import de.FBEditor.utils.Utils;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.JOptionPane;
-
-import de.FBEditor.struct.FBFWVN;
-import de.FBEditor.struct.HttpPost;
-import de.FBEditor.struct.SIDLogin; // 01.03.2014
-import de.FBEditor.utils.Utils;
 
 /**
  * Class holding connection information
  */
-public class FritzBoxConnection {
+public final class FritzBoxConnection {
 
 	private boolean connected = false;
 	private static FritzBoxFirmware firmware;
@@ -25,6 +24,7 @@ public class FritzBoxConnection {
 	private String postdata;
 	private String urlstr;
 	private String urlstr1;
+	private String urlstr2;
 	private String box_password;
 	private String box_username;
 	private static String sRetSID = "0000000000000000";
@@ -50,16 +50,20 @@ public class FritzBoxConnection {
 	private void updateURLstr(String boxAddress) {
 		urlstr = "http://" + boxAddress + "/cgi-bin/webcm";
 		urlstr1 = urlstr;
+		urlstr2 = "http://" + boxAddress;
 	}
 
 	void getAccessMethod() {
-		String data = "";
+		String data;
 		String language = "de";
 		@SuppressWarnings("unused")
 		Boolean speedport = false;
 		boolean detected = false;
 
-		SIDLogin.check("", urlstr1, box_password, box_username, sRetSID);
+//		SIDLogin.check("", urlstr1, box_password, box_username, sRetSID);
+//		sRetSID = SIDLogin.getSessionId();
+
+		SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
 		sRetSID = SIDLogin.getSessionId();
 
 		FBFWVN fbfwvn = new FBFWVN(getFirmwareStatus());
@@ -105,9 +109,12 @@ public class FritzBoxConnection {
 
 			HttpPost http = new HttpPost();
 			boolean isQueryOld = false;
+			boolean isQueryLua = false;
 			String url = urlstr;
-			String sRetQueryOld = "";
-			String sRetQueryNew = "";
+			String sLink;
+			String sRetQueryOld;
+			String sRetQueryNew;
+			String sRetQueryLua;
 			postdata = "sid=" + sRetSID + "&"
 					+ "getpage=../html/query.txt&var:cnt=1" + "&var:n" + "0"
 					+ "=" + "logic:status/nspver";
@@ -123,11 +130,31 @@ public class FritzBoxConnection {
 			} else {
 				data = sRetQueryNew;
 			}
-			System.out.println(url);
+
+			if (sRetQueryOld.length() == sRetQueryNew.length()) {
+				sLink = "/query.lua" + "?" + "sid=" + sRetSID + "&nspver=" + "logic:status/nspver";
+				sRetQueryLua = http.Post(urlstr2 + sLink, "");
+				int nRet = 0;
+				nRet = FbQueryLua.sQueryLuaAll(sRetQueryLua, "nspver=logic:status/nspver", "nspver", "", 1);
+				if (nRet == 1) {
+					data = FbQueryLua.sQueryLuaAllsRetValue();
+					sRetQueryLua = data;
+					isQueryLua = true;
+				} else { 
+					data = "0.0.0";
+				}
+				System.out.println(urlstr2 + sLink);
+				System.out.println("QueryLua: " + isQueryLua + "     " + sRetQueryLua.replace("\n", ""));
+				//System.out.println("");
+			} else {
+				System.out.println(url);
+			}
+
+//			System.out.println(url);
 			System.out.println("QueryOld: " + isQueryOld + "     "
-					+ sRetQueryOld + "     " + sRetQueryNew);
+					+ sRetQueryOld.replace("\n", "") + "     " + sRetQueryNew.replace("\n", ""));
 			// data = "131.06.55-12345"; // Test 01.03.2014
-			//data = "33.04.57-12345"; // Test 01.03.2014
+			// data = "33.04.57-12345"; // Test 01.03.2014
 			Pattern normalFirmware;
 			// normalFirmware = Pattern.compile("([0-9]*).([0-9]*).([0-9]*)");
 			normalFirmware = Pattern
@@ -139,8 +166,7 @@ public class FritzBoxConnection {
 				majorFirmwareVersion = m.group(2);
 				minorFirmwareVersion = m.group(3);
 
-				// modFirmwareVersion = m.group(4).trim(); // Fehler nicht
-				// vorhanden
+				// modFirmwareVersion = m.group(4).trim(); // Fehler nicht vorhanden
 				modFirmwareVersion = ""; // erkennt sonst die Box 701/900 nicht
 
 				try { // Test 01.03.2014
@@ -148,7 +174,7 @@ public class FritzBoxConnection {
 					System.out.println("modFirmwareVersion: " + m.group(4));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
 					System.out.println("error modFirmwareVersion: "
 							+ m.group(4));
 
