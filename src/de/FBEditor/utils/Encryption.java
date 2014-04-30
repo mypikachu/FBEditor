@@ -5,11 +5,16 @@
 package de.FBEditor.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.StringTokenizer;
-
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
@@ -41,8 +46,8 @@ public class Encryption {
 
 			// Return a String representation of the cipher text
 			return getString(ciphertext);
-		} catch (Exception e) {
-            Debug.error(e.toString());
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+                        Debug.error(e.toString());
 		}
 		return null;
 	}
@@ -53,8 +58,8 @@ public class Encryption {
 			SecretKey desKey = keygen.generateKey();
 			byte[] bytes = desKey.getEncoded();
 			return getString(bytes);
-		} catch (Exception e) {
-            Debug.error(e.toString());
+		} catch (NoSuchAlgorithmException e) {
+                        Debug.error(e.toString());
 			return null;
 		}
 	}
@@ -81,7 +86,7 @@ public class Encryption {
 
 			// Return the clear text
 			return new String(cleartext);
-		} catch (Exception e) {
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             Debug.error(e.toString());
 		}
 		return null;
@@ -94,7 +99,7 @@ public class Encryption {
 			SecretKeyFactory skf = SecretKeyFactory.getInstance("DES"); //$NON-NLS-1$
 			SecretKey s = skf.generateSecret(pass);
 			return s;
-		} catch (Exception e) {
+		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             Debug.error(e.toString());
 		}
 		return null;
@@ -102,6 +107,8 @@ public class Encryption {
 
 	/**
 	 * Returns true if the specified text is encrypted, false otherwise
+	 * @param text
+	 * @return 
 	 */
 	public static boolean isEncrypted(String text) {
 		// If the string does not have any separators then it is not
@@ -132,7 +139,8 @@ public class Encryption {
 	}
 
 	private static String getString(byte[] bytes) {
-		StringBuffer sb = new StringBuffer();
+		//StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < bytes.length; i++) {
 			byte b = bytes[i];
 			sb.append((int) (0x00FF & b));
