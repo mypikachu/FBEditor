@@ -42,6 +42,7 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 		insertMode = true;
 	}
 
+        @Override
 	public boolean getScrollableTracksViewportWidth() {
 		if (wrap)
 			return super.getScrollableTracksViewportWidth();
@@ -49,6 +50,7 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 			return false;
 	}
 
+        @Override
 	public void setSize(Dimension d) {
 		if (!wrap && d.width < getParent().getSize().width)
 			d.width = getParent().getSize().width;
@@ -96,12 +98,15 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 		return myLineTerm;
 	}
 
+        @Override
 	public void keyTyped(KeyEvent keyevent) {
 	}
 
+        @Override
 	public void keyPressed(KeyEvent keyevent) {
 	}
 
+        @Override
 	public void keyReleased(KeyEvent arg0) {
 		if (arg0.getKeyCode() == 155)
 			toggleInsertMode();
@@ -162,10 +167,12 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 			}
 	}
 
+        @SuppressWarnings("UnusedAssignment")
 	private static void replace(JTextComponent textComp, String pattern, int replaceAll) {
 		removeHighlights(textComp);
 		Document doc = textComp.getDocument();
-		String text = "";
+		//String text = "";
+                String text;
 		try {
 			text = doc.getText(0, doc.getLength());
 			int pos = textComp.getCaretPosition();
@@ -186,7 +193,7 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 				}
 			}
 		} catch (BadLocationException e1) {
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 	}
 
@@ -195,9 +202,11 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 		MyHighlightPainter myHighlightPainter = new MyHighlightPainter(Color.yellow);
 		Highlighter hilite = textComp.getHighlighter();
 		javax.swing.text.Highlighter.Highlight hilites[] = hilite.getHighlights();
-		for (int i = 0; i < hilites.length; i++)
-			if (hilites[i].getPainter() instanceof MyHighlightPainter)
-				hilite.removeHighlight(hilites[i]);
+         for (Highlighter.Highlight hilite1 : hilites) {
+          if (hilite1.getPainter() instanceof MyHighlightPainter) {
+           hilite.removeHighlight(hilite1);
+          }
+         }
 	}
 
 	boolean wrap;
@@ -205,7 +214,7 @@ public class JTextPane2 extends JTextPane implements KeyListener {
 	public static final int MACOS_LINE_END = 1;
 	public static final int UNIX_LINE_END = 2;
 	private String myLineTerm;
-	@SuppressWarnings("unused")
+        @SuppressWarnings("FieldMayBeFinal")
 	private String origLineTerm;
 	int maxCharacters;
 	private boolean insertMode;
