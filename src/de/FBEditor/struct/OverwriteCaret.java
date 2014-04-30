@@ -13,12 +13,14 @@ public class OverwriteCaret extends DefaultCaret {
 	public OverwriteCaret() {
 	}
 
+        @Override
 	protected synchronized void damage(Rectangle r) {
 		if (r != null)
 			try {
 				JTextComponent comp = getComponent();
 				TextUI mapper = comp.getUI();
 				Rectangle r2 = mapper.modelToView(comp, getDot() + 1);
+                                @SuppressWarnings("LocalVariableHidesMemberVariable")
 				int width = r2.x - r.x;
 				if (width == 0)
 					width = 8;
@@ -31,6 +33,7 @@ public class OverwriteCaret extends DefaultCaret {
 			}
 	}
 
+        @Override
 	public void paint(Graphics g) {
 		if (isVisible())
 			try {
@@ -41,6 +44,7 @@ public class OverwriteCaret extends DefaultCaret {
 				g = g.create();
 				g.setColor(comp.getForeground());
 				g.setXORMode(comp.getBackground());
+                                @SuppressWarnings("LocalVariableHidesMemberVariable")
 				int width = r2.x - r1.x;
 				if (width == 0)
 					width = 8;
