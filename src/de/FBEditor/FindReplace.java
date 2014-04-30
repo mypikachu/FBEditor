@@ -119,6 +119,7 @@ public class FindReplace extends JDialog {
 		jButton1.setPreferredSize(new Dimension(115, 26));
 		jButton1.addActionListener(new ActionListener() {
 
+                        @Override
 			public void actionPerformed(ActionEvent evt) {
 				findActionPerformed();
 			}
@@ -129,6 +130,7 @@ public class FindReplace extends JDialog {
 		jButton4.setPreferredSize(new Dimension(115, 26));
 		jButton4.addActionListener(new ActionListener() {
 
+                        @Override
 			public void actionPerformed(ActionEvent evt) {
 				findAllActionPerformed();
 			}
@@ -139,6 +141,7 @@ public class FindReplace extends JDialog {
 		jButton2.setPreferredSize(new Dimension(115, 26));
 		jButton2.addActionListener(new ActionListener() {
 
+                        @Override
 			public void actionPerformed(ActionEvent evt) {
 				replaceActionPerformed();
 			}
@@ -165,6 +168,7 @@ public class FindReplace extends JDialog {
 		jButton5.setPreferredSize(new Dimension(115, 26));
 		jButton5.addActionListener(new ActionListener() {
 
+                        @Override
 			public void actionPerformed(ActionEvent evt) {
 				jButton5ActionPerformed();
 			}
@@ -208,10 +212,10 @@ public class FindReplace extends JDialog {
 
 	public static final int SEARCH = 1;
 	public static final int REPLACE = 2;
-	private int type;
+	private final int type;
 	private static final long serialVersionUID = 1L;
 	private JTextField TFreplace;
 	private JTextField TFfind;
-	private JTextPane2 pane;
+	private final JTextPane2 pane;
 
 }
