@@ -49,7 +49,7 @@ public class CalcChecksum {
 				line = filename + '\0';
 				updateCRC(line);
 				file = false;
-				return;
+				//return;
 			}
 		} else {
 			if (type == 1) { // cfg file (stripcslashes, add '\n' at the end)
@@ -88,7 +88,8 @@ public class CalcChecksum {
 				return;
 			}
 			if (type == 3) { // variable (remove "=", add '\0' to the end
-				if (line.indexOf("****") != -1) {
+				//if (line.indexOf("****") != -1) {
+                                if (line.contains("****")) {
 					type = 0;
 					calchk(line);
 				}
@@ -96,9 +97,9 @@ public class CalcChecksum {
 					line = line.replaceFirst("=", "");
 					line = line + '\0';
 					updateCRC(line);
-					return;
+					//return;
 				} else {
-					return;
+					//return;
 				}
 			}
 		}
@@ -133,7 +134,7 @@ public class CalcChecksum {
 			crc.update(line.getBytes("ISO-8859-1"));
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 /*
@@ -146,7 +147,8 @@ public class CalcChecksum {
 	 * Calculate new checksum and replace if different
  	 */
 	public static String replaceChecksum(String text) {
-		String newText = "";
+		//String newText = "";
+                String newText;
 		String checksum;
 		if ((checksum = Utils.pMatch("\\*\\*\\*\\* END OF EXPORT (.*?) \\*\\*\\*\\*", text, 1)) != null) {
 			CalcChecksum exportsumme = new CalcChecksum();
