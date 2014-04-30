@@ -1,6 +1,8 @@
 package de.FBEditor.utils;
 
-
+import de.FBEditor.FBEdit;
+import de.FBEditor.struct.MyProperties;
+import de.FBEditor.struct.SIDLogin;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,18 +19,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.JOptionPane;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-
-import de.FBEditor.FBEdit;
-import de.FBEditor.struct.MyProperties;
-import de.FBEditor.struct.SIDLogin;
 
 public class Utils {
 
@@ -36,14 +32,16 @@ public class Utils {
 	public static boolean checkhost(String host) throws IOException {
 		String[] temp;
 		int port;
-		Boolean bool = false;
+		//Boolean bool = false;
+		Boolean bool;
 
 		Pattern p = Pattern.compile(":");
 		temp = p.split(host);
 
 		InetAddress addr = InetAddress.getByName(temp[0]);
 		if (temp.length == 2)
-			port = Integer.valueOf(temp[1]).intValue();
+			//port = Integer.valueOf(temp[1]).intValue();
+                        port = Integer.valueOf(temp[1]);
 		else
 			port = 80;
 
@@ -51,7 +49,7 @@ public class Utils {
 		Socket test = new Socket();
 		int timeoutMs = 1000; // 1 second
 		test.connect(sockaddr, timeoutMs);
-		test.close();
+		//test.close();
 		bool = true;
 		return bool;
 	}
@@ -74,22 +72,46 @@ public class Utils {
 			File uploadFile = createTempFile(data);
 			PostMethod mPost = new PostMethod(url);
 
+			// Kennwort der Sicherungsdatei
+			String ConfigImExPwd = "";
+			String box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
+			System.out.println("box.ConfigImExPwd: " + box_ConfigImExPwd);
+
+			if ( !"".equals(box_ConfigImExPwd) ) {
+				// Hier kann man ein PopUp Dialog verwenden
+				// mit der Frage, mit oder ohne Kennwort Speichern
+
+				FBEdit.getInstance().getConfigImExPwd(false);
+
+	            if ( FBEdit.isConfigImExPwdOk() == true ) {
+			    	box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
+		    		// ConfigImExPwd = ""; // Abbrechen -> ohne Kennwort
+	    			ConfigImExPwd = box_ConfigImExPwd; // OK -> mit Kennwort	
+	            }
+				System.out.println("ConfigImExPwd: " + ConfigImExPwd + " -> " + FBEdit.isConfigImExPwdOk());
+			}
+
 			String sid = SIDLogin.getSessionId();
 
-			Part[] parts = null;
+			//Part[] parts = null;
+			Part[] parts;
 			if (SIDLogin.isSidLogin()) {
 				// with session id
 				parts = new Part[3];
 				parts[0] = new StringPartNoTransferEncoding("sid", sid);
+				//parts[1] = new StringPartNoTransferEncoding(
+				//		"ImportExportPassword", "");
 				parts[1] = new StringPartNoTransferEncoding(
-						"ImportExportPassword", "");
+						"ImportExportPassword", ConfigImExPwd);
 				parts[2] = new FilePart("ConfigImportFile",
 						uploadFile.getName(), uploadFile);
 			} else {
 				// old style, no session id
 				parts = new Part[2];
+				//parts[0] = new StringPartNoTransferEncoding(
+				//		"ImportExportPassword", "");
 				parts[0] = new StringPartNoTransferEncoding(
-						"ImportExportPassword", "");
+						"ImportExportPassword", ConfigImExPwd);
 				parts[1] = new FilePart("ConfigImportFile",
 						uploadFile.getName(), uploadFile);
 			}
@@ -106,13 +128,14 @@ public class Utils {
 			BufferedInputStream bis = new BufferedInputStream(
 					mPost.getResponseBodyAsStream());
 			byte buf[] = new byte[4096];
-			StringBuffer sb = new StringBuffer();
+			//StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			int len;
 			while ((len = bis.read(buf)) > 0)
 				sb.append(new String(buf, 0, len));
 			data = HTMLUtil.stripEntities(sb.toString());
 			data = HTMLUtil.stripNbsp(data);
-			bis.close();
+			//bis.close();
 
 			if (statusCode1 == 200 && checkResponse(data))
 				result = true;
@@ -143,6 +166,7 @@ public class Utils {
 		properties.setProperty("box.address", "fritz.box");
 		properties.setProperty("box.password", "");
 		properties.setProperty("box.username", "");
+		properties.setProperty("box.ConfigImExPwd", "");
 		properties.setProperty("readOnStartup", "no");
 //		properties.setProperty("NoChecks", "true"); // 17.02.2014
 		properties.setProperty("NoChecks", "false"); // 17.02.2014
@@ -157,7 +181,7 @@ public class Utils {
 		try {
 			FileInputStream fis = new FileInputStream(PROPERTIES_FILE);
 			properties.loadFromXML(fis);
-			fis.close();
+			//fis.close();
 			return true;
 		} catch (FileNotFoundException e) {
 			System.out.println("File " + PROPERTIES_FILE
@@ -165,36 +189,38 @@ public class Utils {
 			properties.setProperty("box.address", "fritz.box");
 			properties.setProperty("box.password", "");
 			properties.setProperty("box.username", "");
+			properties.setProperty("box.ConfigImExPwd", "");
 			properties.setProperty("readOnStartup", "no");
 //			properties.setProperty("NoChecks", "true"); // 17.02.2014
 			properties.setProperty("NoChecks", "false"); // 17.02.2014
 			properties.setProperty("language", "de_DE");
-		} catch (Exception exception) {
+		} catch (IOException exception) {
 		}
 		return false;
 	}
 
 	public static void saveProperties(String PROPERTIES_FILE, FBEdit fbedit) {
 		MyProperties properties = new MyProperties();
-		properties.setProperty("position.left",
-				Integer.toString(fbedit.getLocation().x));
 		properties.setProperty("position.top",
 				Integer.toString(fbedit.getLocation().y));
-		properties.setProperty("position.width",
-				Integer.toString(fbedit.getSize().width));
+		properties.setProperty("position.left",
+				Integer.toString(fbedit.getLocation().x));
 		properties.setProperty("position.height",
 				Integer.toString(fbedit.getSize().height));
+		properties.setProperty("position.width",
+				Integer.toString(fbedit.getSize().width));
+		properties.setProperty("box.address", fbedit.getbox_address());
 		properties.setProperty("box.password",
 				Encryption.encrypt(fbedit.getbox_password()));
 		properties.setProperty("box.username", fbedit.getbox_username());
-		properties.setProperty("box.address", fbedit.getbox_address());
+		properties.setProperty("box.ConfigImExPwd", fbedit.getbox_ConfigImExPwd());
 		properties.setProperty("readOnStartup", fbedit.getRASstate());
 		properties.setProperty("NoChecks", fbedit.getNoChecksState());
 		properties.setProperty("language", fbedit.getLanguage());
 		try {
 			FileOutputStream fos = new FileOutputStream(PROPERTIES_FILE);
 			properties.storeToXML(fos, "Properties for FBEditor");
-			fos.close();
+			//fos.close();
 		} catch (FileNotFoundException filenotfoundexception) {
 		} catch (IOException ioexception) {
 		}
@@ -210,12 +236,13 @@ public class Utils {
 		// Write to temp file
 		BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 		out.write(data);
-		out.close();
+		//out.close();
 		return temp;
 	}
 
 	private static boolean checkResponse(String data) {
-		return (data.indexOf("fehlgeschlagen") == -1);
+		//return (data.indexOf("fehlgeschlagen") == -1);
+       		return (!data.contains("fehlgeschlagen"));
 	}
 
 }
