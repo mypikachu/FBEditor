@@ -17,7 +17,7 @@ public class HTMLUtil {
     /**
      * allows lookup by entity name, to get the corresponding char.
      */
-    private static HashMap<String, Character> entityToChar;
+    private static final HashMap<String, Character> entityToChar;
 
     /**
      * Longest an entity can be {@value #LONGEST_ENTITY}, at least in our
@@ -544,11 +544,12 @@ public class HTMLUtil {
             9830 /* &diams; */,
 
         };
-        entityToChar = new HashMap<String, Character>( 511 );
+        //entityToChar = new HashMap<String, Character>( 511 );
+        entityToChar = new HashMap<>( 511 );
         for ( int i = 0; i < entityKeys.length; i++ )
             {
-            entityToChar.put( entityKeys[ i ],
-                new Character( entityValues[ i ] ) );
+            //entityToChar.put( entityKeys[ i ], new Character( entityValues[ i ] ) );
+            entityToChar.put( entityKeys[ i ], entityValues[ i ]);
             }
         }
 
@@ -564,9 +565,11 @@ public class HTMLUtil {
     public static char entityToChar ( String entity )
         {
         Character code = entityToChar.get( entity );
-        if ( code != null ) { return code.charValue(); }
+        //if ( code != null ) { return code.charValue(); }
+        if ( code != null ) { return code; }
         code = entityToChar.get( entity.toLowerCase() );
-        if ( code != null ) { return code.charValue(); }
+        //if ( code != null ) { return code.charValue(); }
+        if ( code != null ) { return code; }
         // check at least have &#1;
         if ( entity.length() < 2 ) return 0;
         try
@@ -643,7 +646,8 @@ public class HTMLUtil {
             return text;
             }
         int originalTextLength = text.length();
-        StringBuffer sb = new StringBuffer( originalTextLength );
+        //StringBuffer sb = new StringBuffer( originalTextLength );
+        StringBuilder sb = new StringBuilder( originalTextLength );
         for ( int i = 0; i < originalTextLength; i++ )
             {
             int whereAmp = text.indexOf( '&', i );
@@ -696,7 +700,8 @@ public class HTMLUtil {
     public static String stripHTMLTags ( String html )
         {
         int numChars = html.length();
-        StringBuffer result = new StringBuffer( numChars );
+        //StringBuffer result = new StringBuffer( numChars );
+        StringBuilder result = new StringBuilder( numChars );
         boolean inside = false;
         boolean lastCharSpace = false;
         for ( int i = 0; i < numChars; i++ )
