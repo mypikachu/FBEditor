@@ -9,6 +9,8 @@ class ActionListen implements ActionListener {
 		this.fbedit = fbedit;
 	}
 
+
+        @Override
 	public void actionPerformed(ActionEvent event) {
 		CutAndPastePopup cutAndPaste = fbedit.getCutAndPaste();
 		cutAndPaste.updateSource(fbedit.getEditor());
@@ -53,6 +55,9 @@ class ActionListen implements ActionListener {
 		case "username":
 			fbedit.getUsername(false);
 			break;
+		case "configimexpwd":
+			fbedit.getConfigImExPwd(false);
+			break;
 		case "boxinfo":
 			fbedit.showBoxInfo();
 			break;
@@ -90,7 +95,7 @@ class ActionListen implements ActionListener {
 		}
 	}
 
-	private FBEdit fbedit;
+	private final FBEdit fbedit;
 	public static final int addundo = 1;
 	public static final int addredo = 2;
 }
