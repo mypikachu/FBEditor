@@ -1,22 +1,23 @@
 package de.FBEditor;
 
+
 /**
  * Class modelling firmware and box information
  * 
  */
 public class FritzBoxFirmware {
 
-    private String FritzboxName;
-    private int boxtype; // Muss Integer sein wegen neuen Firmware Typ > 127
-    private byte majorFirmwareVersion;
-    private byte minorFirmwareVersion;
-    private String modFirmwareVersion;
-    @SuppressWarnings("unused")
-	private String language;
+    private final String FritzboxName;
+    private final int boxtype; // Muss Integer sein wegen neuen Firmware Typ > 127
+    private final byte majorFirmwareVersion;
+    private final byte minorFirmwareVersion;
+    private final String modFirmwareVersion;
+    private final String language;
 
     /**
      * Firmware Constructor using Strings
      * 
+     * @param FritzboxName
      * @param boxtype
      * @param majorFirmwareVersion
      * @param minorFirmwareVersion
@@ -33,10 +34,10 @@ public class FritzBoxFirmware {
         this.modFirmwareVersion = modFirmwareVersion;
         this.language = language;
     }
-    
-	public String getFritzboxName() {
-		return FritzboxName;
-	}
+
+    public String getFritzboxName() {
+        return FritzboxName;
+    }
 
     /**
      * @return Returns the boxtype.
@@ -45,26 +46,26 @@ public class FritzBoxFirmware {
         return boxtype;
     }
 
-	/**
-	 * @return Returns the majorFirmwareVersion.
-	 */
-	public final byte getMajorFirmwareVersion() {
-		return majorFirmwareVersion;
-	}
+    /**
+     * @return Returns the majorFirmwareVersion.
+     */
+    public final byte getMajorFirmwareVersion() {
+        return majorFirmwareVersion;
+    }
 
-	/**
-	 * @return Returns the minorFirmwareVersion.
-	 */
-	public final byte getMinorFirmwareVersion() {
-		return minorFirmwareVersion;
-	}
+    /**
+     * @return Returns the minorFirmwareVersion.
+     */
+    public final byte getMinorFirmwareVersion() {
+        return minorFirmwareVersion;
+    }
 
-	/**
-	 * @return Returns the minorFirmwareVersion.
-	 */
-	public final String getModFirmwareVersion() {
-		return modFirmwareVersion;
-	}
+    /**
+     * @return Returns the minorFirmwareVersion.
+     */
+    public final String getModFirmwareVersion() {
+        return modFirmwareVersion;
+    }
 
     /**
      * @return Returns the majorFirmwareVersion.
@@ -86,9 +87,9 @@ public class FritzBoxFirmware {
                                                                 // modFirmwareVersion;
     }
 
-	public String getBoxName() {
+    public String getBoxName() {
 
- 	      System.out.println( "Debug FritzBoxFirmware: " + FritzboxName + " -> " + boxtype );
+          System.out.println( "Debug FritzBoxFirmware: " + FritzboxName + " -> " + boxtype );
  	    
           if ((FritzboxName.length() > 0) && (boxtype > 0)) {
            return FritzboxName;
