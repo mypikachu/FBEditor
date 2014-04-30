@@ -156,6 +156,11 @@ public class MyMenu {
 		mi.setActionCommand("username");
 		mi.addActionListener(action);
 		ret.add(mi);
+		mi = new JMenuItem(FBEdit.getMessage("menu.configimexpwd"), 67);
+//		fbedit.setCtrlAccelerator(mi, 'C');
+		mi.setActionCommand("configimexpwd");
+		mi.addActionListener(action);
+		ret.add(mi);
 		readOnStartup = new JCheckBoxMenuItem(FBEdit.getMessage("menu.config_auto_read"), Boolean.parseBoolean(fbedit.getRASstate()));
 		readOnStartup.setActionCommand("config_auto_read");
 		readOnStartup.addActionListener(action);
@@ -163,7 +168,8 @@ public class MyMenu {
 		NoChecks = new JCheckBoxMenuItem(FBEdit.getMessage("menu.nochecks"), Boolean.parseBoolean(fbedit.getNoChecksState()));
 		NoChecks.setActionCommand("nochecks");
 		NoChecks.addActionListener(action);
-		// NoChecks.setEnabled(false);
+		// Disable NoChecks because it doesn't work at the moment
+//		NoChecks.setEnabled(false); // 17.02.2014
 		ret.add(NoChecks);
 		return ret;
 	}
@@ -198,6 +204,6 @@ public class MyMenu {
 	JCheckBoxMenuItem readOnStartup;
 	JCheckBoxMenuItem NoChecks;
 	JLabel statusMsg;
-	private ActionListen action;
-	private FBEdit fbedit;
+	private final ActionListen action;
+	private final FBEdit fbedit;
 }
