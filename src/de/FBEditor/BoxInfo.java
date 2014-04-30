@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import de.FBEditor.exceptions.InvalidFirmwareException;
 import de.FBEditor.exceptions.WrongPasswordException;
 
-public class BoxInfo extends JDialog {
+public final class BoxInfo extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel jPanel = null;
@@ -30,6 +30,9 @@ public class BoxInfo extends JDialog {
 	
 	/**
 	 * This is the default constructor
+	 * @param boxName
+	 * @param firmwareVersion
+	 * @param modVersion
 	 * @throws InvalidFirmwareException 
 	 * @throws IOException 
 	 * @throws WrongPasswordException 
