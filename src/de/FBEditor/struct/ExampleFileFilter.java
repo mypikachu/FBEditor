@@ -61,7 +61,7 @@ import javax.swing.filechooser.*;
  * @version 1.5 06/13/02
  * @author Jeff Dinkins
  */
-public class ExampleFileFilter extends FileFilter {
+public final class ExampleFileFilter extends FileFilter {
 
 	@SuppressWarnings("unused")
 	private static String TYPE_UNKNOWN = "Type Unknown";
@@ -87,6 +87,7 @@ public class ExampleFileFilter extends FileFilter {
 	 * Creates a file filter that accepts files with the given extension.
 	 * Example: new ExampleFileFilter("jpg");
 	 * 
+	 * @param extension
 	 * @see #addExtension
 	 */
 	public ExampleFileFilter(String extension) {
@@ -100,6 +101,8 @@ public class ExampleFileFilter extends FileFilter {
 	 * Note that the "." before the extension is not needed. If provided, it
 	 * will be ignored.
 	 * 
+	 * @param extension
+	 * @param description
 	 * @see #addExtension
 	 */
 	public ExampleFileFilter(String extension, String description) {
