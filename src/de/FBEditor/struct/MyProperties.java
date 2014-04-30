@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -17,7 +16,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,30 +39,34 @@ public class MyProperties extends Properties {
 	public MyProperties() {
 	}
 
+        @Override
 	public synchronized void loadFromXML(InputStream in) throws IOException {
 		if (in == null)
 			throw new NullPointerException();
 		try {
 			load(this, in);
-		} catch (Exception e) {
+		} catch (IOException | SAXException e) {
 			throw new IOException("Konnte Einstellungen nicht laden!");
 		}
 	}
 
+        @Override
 	public synchronized void storeToXML(OutputStream os, String comment)
 			throws IOException {
 		if (os == null) {
 			throw new NullPointerException();
 		} else {
 			save(this, os, comment, "UTF-8");
-			return;
+			//return;
 		}
 	}
 
+        @Override
 	public synchronized Object setProperty(String key, String value) {
 		return super.setProperty(key, value);
 	}
 
+        @Override
 	public String getProperty(String key) {
 		// Fehler: NullPointerException wenn der key Fehlt korrigiert 22.02.2014
 		if (super.getProperty(key) == null) {
@@ -75,8 +77,9 @@ public class MyProperties extends Properties {
 		return super.getProperty(key);
 	}
 
+        @Override
 	public String getProperty(String key, String defaultValue) {
-		// Fehler: defaultValue wurde nicht gesetzt bei Leerstring korrigiert
+		// Fehler: defaultValue wurde nicht Gesetzt bei Leerstring korrigiert
 		// 22.02.2014
 		String val = super.getProperty(key, defaultValue);
 
@@ -87,13 +90,15 @@ public class MyProperties extends Properties {
 		return super.getProperty(key, defaultValue);
 	}
 
+        @Override
 	public Object remove(Object key) {
 		return super.remove(key);
 	}
 
 	public static void load(Properties props, InputStream in)
 			throws IOException, SAXException {
-		Document doc = null;
+		//Document doc = null;
+                Document doc;
 		doc = getLoadingDoc(in);
 		Element propertiesElement = (Element) doc.getChildNodes().item(1);
 		String xmlVersion = propertiesElement.getAttribute("version");
@@ -110,7 +115,7 @@ public class MyProperties extends Properties {
 							.toString());
 		} else {
 			importProperties(props, propertiesElement);
-			return;
+			//return;
 		}
 	}
 
@@ -125,6 +130,7 @@ public class MyProperties extends Properties {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			db.setEntityResolver(new EntityResolver() {
 
+                                @Override
 				public InputSource resolveEntity(String pid, String sid)
 						throws SAXException {
 					if (sid.equals("http://java.sun.com/dtd/properties.dtd")) {
@@ -143,14 +149,17 @@ public class MyProperties extends Properties {
 			});
 			db.setErrorHandler(new ErrorHandler() {
 
+                                @Override
 				public void error(SAXParseException x) throws SAXException {
 					throw x;
 				}
 
+                                @Override
 				public void fatalError(SAXParseException x) throws SAXException {
 					throw x;
 				}
 
+                                @Override
 				public void warning(SAXParseException x) throws SAXException {
 					throw x;
 				}
@@ -228,9 +237,7 @@ public class MyProperties extends Properties {
 		try {
 			t.transform(doms, sr);
 		} catch (TransformerException te) {
-			IOException ioe = new IOException();
-			ioe.initCause(te);
-			throw ioe;
+			throw new IOException(te);
 		}
 	}
 
