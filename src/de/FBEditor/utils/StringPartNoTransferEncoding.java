@@ -8,10 +8,12 @@ public class StringPartNoTransferEncoding extends StringPart {
 		super(name, value);
 	}
 
+        @Override
 	public String getTransferEncoding() {
 		return null;
 	}
 
+        @Override
 	public String getContentType() {
 		return null;
 	}
