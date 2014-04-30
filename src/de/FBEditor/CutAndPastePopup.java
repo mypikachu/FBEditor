@@ -5,7 +5,8 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -75,6 +76,7 @@ public class CutAndPastePopup extends JComponent implements ClipboardOwner {
 		// revert.setEnabled(undoManager.canUndo());
 	}
 
+        @Override
 	public void lostOwnership(Clipboard c, Transferable t) {
 		selection = null;
 	}
@@ -110,7 +112,7 @@ public class CutAndPastePopup extends JComponent implements ClipboardOwner {
 			String clipString = (String) clipData.getTransferData(DataFlavor.stringFlavor);
 			source.replaceSelection(clipString);
 			/* updateMenu(); */
-		} catch (Exception ex) {
+		} catch (UnsupportedFlavorException | IOException ex) {
 			System.out.println("not String flavor");
 		}
 	}
@@ -127,7 +129,7 @@ public class CutAndPastePopup extends JComponent implements ClipboardOwner {
 
 	private static final long serialVersionUID = 1L;
 	private static JPopupMenu popupMenu;
-	private Clipboard clipbd;
+	private final Clipboard clipbd;
 	private String selection;
 	JMenuItem revert;
 	JMenuItem cut;
