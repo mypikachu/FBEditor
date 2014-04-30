@@ -46,6 +46,13 @@ public class SIDLogin {
 		INSTANCE = null;
 	}
 
+	public static void Login(String box_name, String urlstr,
+			String box_password, String box_username, String sRetSID) {
+		
+		check(box_name, urlstr, box_password, box_username, sRetSID);
+		
+	}
+
 	public static void check(String box_name, String urlstr,
 			String box_password, String box_username, String sRetSID) {
 		try {
@@ -59,7 +66,8 @@ public class SIDLogin {
 			UrlLogoutFB = Url2.getProtocol() + "://" + Url2.getHost()
 					+ "/cgi-bin/webcm";
 			String sUrl = Url2.getProtocol() + "://" + Url2.getHost() + "";
-			String sPostdata = "";
+			//String sPostdata = "";
+                        String sPostdata;
 
 			HttpPost http = new HttpPost(); // 23.11.2012
 			TsessionId = "1 --- " + urlstr;
@@ -77,7 +85,8 @@ public class SIDLogin {
 
 				if (writeAccess == 0) { // answer challenge
 					// try {
-					String challenge = "";
+					//String challenge = "";
+                                        String challenge;
 					Pattern challengePattern = Pattern
 							.compile(PATTERN_CHALLENGE);
 					Matcher challengeMatcher = challengePattern
@@ -106,7 +115,8 @@ public class SIDLogin {
 						}
 						String md5Pass = "";
 						// byte passwordBytes[] = null;
-						byte[] passwordBytes = new byte[0]; // 30.10.2012
+						//byte[] passwordBytes = new byte[0]; // 30.10.2012
+                                                byte[] passwordBytes; // 30.10.2012
 						try {
 							passwordBytes = pwd.getBytes("UTF-16LE");
 							m.update(passwordBytes, 0, passwordBytes.length);
@@ -209,7 +219,8 @@ public class SIDLogin {
 
 					if ("0000000000000000".equals(SIDwriteAccess)) { // answer
 																		// challenge
-						String challenge = "";
+						//String challenge = "";
+                                                String challenge;
 						Pattern challengePattern = Pattern
 								.compile(PATTERN_CHALLENGE);
 						Matcher challengeMatcher = challengePattern
@@ -239,7 +250,8 @@ public class SIDLogin {
 										Level.SEVERE, null, ex);
 							}
 							String md5Pass = "";
-							byte[] passwordBytes = new byte[0]; // 30.10.2012
+							//byte[] passwordBytes = new byte[0]; // 30.10.2012
+                                                        byte[] passwordBytes; // 30.10.2012
 							try {
 								passwordBytes = pwd.getBytes("UTF-16LE");
 								m.update(passwordBytes, 0, passwordBytes.length);
@@ -339,11 +351,14 @@ public class SIDLogin {
 					// login_xml = http.Post( urlstr, sPostdata); // 23.11.2012
 					login_xml = http.Post(sUrl + "/cgi-bin/webcm", sPostdata); // 23.11.2012
 
+                                        /*
 					if ("".equals(login_xml)) {
 						isLoginOld = true; // sidLogin = true;
 					} else { // 01.03.2014
 						isLoginOld = false; // sidLogin = false;
 					}
+                                        */
+                                        isLoginOld = "".equals(login_xml);
 					// System.out.println("Login: " + isLoginOld + "   " +
 					// login_xml);
 					TsessionId = "1 -> 2";
@@ -397,7 +412,8 @@ public class SIDLogin {
 		}
 
 		HttpPost http = new HttpPost(); // 23.11.2012
-		String login_xml = "";
+		//String login_xml = "";
+                String login_xml;
 		isLogOut = false;
 
 		if (sidLogin == true) {
