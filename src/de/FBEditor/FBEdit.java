@@ -48,7 +48,7 @@ import de.FBEditor.utils.Utils;
 public class FBEdit extends JFrame implements Runnable
 
 {
-	private static final String version = "0.7.2";
+	private static final String version = "0.6.9.5";
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
 	public static FritzBoxConnection fbConnection = null;
@@ -64,6 +64,8 @@ public class FBEdit extends JFrame implements Runnable
 	private static String box_address = "";
 	private static String box_password = "";
 	private static String box_username = "";
+	private static String box_ConfigImExPwd = "";
+	private static boolean box_isConfigImExPwdOk = false;
 	private static String readOnStartup = "false";
 	private static String NoChecks = "false";
 	private static String language = "false";
@@ -107,6 +109,9 @@ public class FBEdit extends JFrame implements Runnable
 			System.out.println("position_left: " + position_left);
 			System.out.println("position_height: " + position_height);
 			System.out.println("position_width: " + position_width);
+
+			box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
+//			System.out.println("box.ConfigImExPwd: " + box_ConfigImExPwd);
 
 			setLocation(Integer.parseInt(position_left.trim()),
 					Integer.parseInt(position_top.trim()));
@@ -252,7 +257,7 @@ public class FBEdit extends JFrame implements Runnable
 			cre.printStackTrace();
 		}
 		updateMenu(myMenu);
-		return;
+		//return;
 	}
 
 	public JTextComponent getEditor() {
@@ -294,8 +299,9 @@ public class FBEdit extends JFrame implements Runnable
 	// Editor mit Inhalt füllen
 	public void setData(String data) {
 		JTextPane2 pane2 = this.getJTextPane();
-
 		pane2.setText("");
+// Consolas Font Pack for Microsoft Visual Studio 2005 or 2008
+// Download: http://www.microsoft.com/en-us/download/details.aspx?id=17879
 		pane2.setFont(new Font("Consolas", 0, 12));
 		pane2.setEditable(false);
 		undoManager.pause();
@@ -451,6 +457,30 @@ public class FBEdit extends JFrame implements Runnable
 			makeNewConnection(first);
 	}
 
+	public void getConfigImExPwd(boolean first) {
+		String new_box_ConfigImExPwd = JOptionPane.showInputDialog(this,
+				FBEdit.getMessage("settings.ConfigImExPwd"), box_ConfigImExPwd);
+		if (new_box_ConfigImExPwd != null && !new_box_ConfigImExPwd.equals(box_ConfigImExPwd)) {
+			box_ConfigImExPwd = new_box_ConfigImExPwd;
+
+		}
+		
+		if (new_box_ConfigImExPwd != null) {
+			//box_isConfigImExPwdOk = true;
+			setConfigImExPwdOk(true);
+			System.out.println("new_box_ConfigImExPwd true: " + isConfigImExPwdOk());
+		} else if (new_box_ConfigImExPwd == null) {	
+			//box_isConfigImExPwdOk = false;
+			setConfigImExPwdOk(false);
+			System.out.println("new_box_ConfigImExPwd false: " + isConfigImExPwdOk());
+		}
+
+		System.out.println("new_box_ConfigImExPwd: " + new_box_ConfigImExPwd + " -> " + isConfigImExPwdOk());
+
+		if (!first)
+			setbox_ConfigImExPwd(box_ConfigImExPwd);
+	}
+
 	public void enableMenu(boolean bool) {
 		// After settings restore only reconnect is allowed
 		myMenu.hardmenu.setEnabled(bool);
@@ -472,12 +502,12 @@ public class FBEdit extends JFrame implements Runnable
 		return INSTANCE;
 	}
 
-       private static void sleep(long millis) {
-               try {
- 			Thread.sleep(millis);
-               } catch (InterruptedException ignored) {
-               }
-       }       
+	private static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException ignored) {
+		}
+	}       
 
 	public static void main(String[] s) {
 		FBEdit fbedit = new FBEdit();
@@ -532,9 +562,27 @@ public class FBEdit extends JFrame implements Runnable
 	public String getbox_password() {
 		return box_password;
 	}
-	
+
 	public String getbox_username() {
 		return box_username;
+	}
+
+	public void setbox_ConfigImExPwd(String boxConfigImExPwd) {
+		box_ConfigImExPwd = boxConfigImExPwd;
+		properties.setProperty("box.ConfigImExPwd", box_ConfigImExPwd);
+		System.out.println("Set box.ConfigImExPwd: " + box_ConfigImExPwd);
+	}
+
+	public String getbox_ConfigImExPwd() {
+//		box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
+		return box_ConfigImExPwd;
+	}
+	public static boolean isConfigImExPwdOk() {
+		return box_isConfigImExPwdOk;
+	}
+
+	public static void setConfigImExPwdOk(boolean ConfigImExPwdOk) {
+		box_isConfigImExPwdOk = ConfigImExPwdOk;
 	}
 
 	public MyMenu getMenu() {
@@ -702,6 +750,7 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	/**
+	 * @param msg
 	 * @return Returns an internationalized message.
 	 */
 	public static String getMessage(String msg) {
