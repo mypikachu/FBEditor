@@ -57,7 +57,7 @@ public class MyProperties extends Properties {
 			throw new NullPointerException();
 		} else {
 			save(this, os, comment, "UTF-8");
-			return;
+			//return;
 		}
 	}
 
@@ -76,7 +76,7 @@ public class MyProperties extends Properties {
 	}
 
 	public String getProperty(String key, String defaultValue) {
-		// Fehler: defaultValue wurde nicht gesetzt bei Leerstring korrigiert
+		// Fehler: defaultValue wurde nicht Gesetzt bei Leerstring korrigiert
 		// 22.02.2014
 		String val = super.getProperty(key, defaultValue);
 
@@ -110,7 +110,7 @@ public class MyProperties extends Properties {
 							.toString());
 		} else {
 			importProperties(props, propertiesElement);
-			return;
+			//return;
 		}
 	}
 
