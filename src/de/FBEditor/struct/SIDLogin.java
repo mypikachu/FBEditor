@@ -46,6 +46,13 @@ public class SIDLogin {
 		INSTANCE = null;
 	}
 
+	public static void Login(String box_name, String urlstr,
+			String box_password, String box_username, String sRetSID) {
+		
+		check(box_name, urlstr, box_password, box_username, sRetSID);
+		
+	}
+
 	public static void check(String box_name, String urlstr,
 			String box_password, String box_username, String sRetSID) {
 		try {
