@@ -71,7 +71,7 @@ public class Debug {
 	 * 
 	 * Turn on logging mode to file
 	 * 
-	 * @param fname
+	 * @param fName
 	 *            Filename to log into
 	 */
 	public static void logToFile(final String fName) {
@@ -108,7 +108,7 @@ public class Debug {
 	 * Print message with prioriry level
 	 * 
 	 * @param level
-	 * @param message
+	 * @param msg
 	 */
 	private static void msg(LogSeverity level, final String msg) {
 		if ( (debugLevel == null)
@@ -129,7 +129,7 @@ public class Debug {
 	 * This is a modified message function, used by the network subsystem
 	 * so the debug output is more readable
 	 * 
-	 * @param message
+	 * @param msg
 	 */
 	public static void netMsg(final String msg){
 		msg(LS_NETWORK, msg);		
