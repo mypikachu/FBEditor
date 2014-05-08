@@ -2,6 +2,7 @@ package de.FBEditor;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+
 import javax.swing.JOptionPane;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -29,6 +30,25 @@ public class ImportData implements Runnable {
 				.append("/cgi-bin/firmwarecfg").toString();
 		PostMethod mPost = new PostMethod(url);
 
+		// Kennwort der Sicherungsdatei
+		String ConfigImExPwd = "";
+		String box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
+		System.out.println("box.ConfigImExPwd: " + box_ConfigImExPwd);
+
+		if ( !"".equals(box_ConfigImExPwd) ) {
+			// Hier kann man ein PopUp Dialog verwenden
+			// mit der Frage, mit oder ohne Kennwort Lesen
+
+			FBEdit.getInstance().getConfigImExPwd(false);
+
+			if ( FBEdit.isConfigImExPwdOk() == true ) {
+				box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
+				// ConfigImExPwd = ""; // Abbrechen -> ohne Kennwort
+				ConfigImExPwd = box_ConfigImExPwd; // OK -> mit Kennwort	
+			}
+			System.out.println("ConfigImExPwd: " + ConfigImExPwd + " -> " + FBEdit.isConfigImExPwdOk());
+		}
+
 		try {
 			String sid = SIDLogin.getSessionId();
 
@@ -41,14 +61,18 @@ public class ImportData implements Runnable {
 				// with session id
 				parts = new Part[3];
 				parts[0] = new StringPartNoTransferEncoding("sid", sid);
+				//parts[1] = new StringPartNoTransferEncoding(
+				//		"ImportExportPassword", "");
 				parts[1] = new StringPartNoTransferEncoding(
-						"ImportExportPassword", "");
+						"ImportExportPassword", ConfigImExPwd);
 				parts[2] = new StringPartNoTransferEncoding("ConfigExport", "");
 			} else {
 				// old style, no session id
 				parts = new Part[2];
+				//parts[0] = new StringPartNoTransferEncoding(
+				//		"ImportExportPassword", "");
 				parts[0] = new StringPartNoTransferEncoding(
-						"ImportExportPassword", "");
+						"ImportExportPassword", ConfigImExPwd);
 				parts[1] = new StringPartNoTransferEncoding("ConfigExport", "");
 			}
 
