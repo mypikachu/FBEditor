@@ -179,8 +179,8 @@ public class BoxInfo extends JDialog {
 		*/
 		if (modVersion.equals("")) {
 			jLabel6.setText(FBEdit.getMessage("boxinfo.nomod"));
-		} else {
+	    } else {
 			jLabel6.setText(modVersion);
-		}
+	    }
 	}
 }
