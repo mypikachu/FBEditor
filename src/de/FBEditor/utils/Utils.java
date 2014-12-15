@@ -69,9 +69,9 @@ public class Utils {
 			String data) {
 		boolean result = false;
 
-               // 14.12.2014
-               FritzBoxFirmware firmware = null;
-               firmware = fbConnection.getFirmware();
+                // 14.12.2014
+                FritzBoxFirmware firmware = null;
+                firmware = fbConnection.getFirmware();
 
 		try {
 			String url = (new StringBuilder("http://")).append(box_address)
@@ -106,8 +106,8 @@ public class Utils {
 				// with session id
                                 // 14.12.2014 ab Firmware xxx.06.xx with "apply"
                                 if (firmware.getMajorFirmwareVersion() >= 6) { // ab Firmware xxx.06.xx with "apply"
-                                       System.out.println("DEBUG: firmware.getMajorFirmwareVersion() >= 6: " + firmware.getMajorFirmwareVersion());
-                                       parts = new Part[4];
+                                        System.out.println("DEBUG: firmware.getMajorFirmwareVersion() >= 6: " + firmware.getMajorFirmwareVersion());
+                                        parts = new Part[4];
 				        parts[0] = new StringPartNoTransferEncoding("sid", sid);
 				        //parts[1] = new StringPartNoTransferEncoding(
 				        //		"ImportExportPassword", "");
@@ -118,8 +118,8 @@ public class Utils {
 				        parts[3] = new StringPartNoTransferEncoding(
 				        		"apply", "");
                                 } else {
-                                       System.out.println("DEBUG: firmware.getMajorFirmwareVersion(): " + firmware.getMajorFirmwareVersion());
-                                       parts = new Part[3];
+                                        System.out.println("DEBUG: firmware.getMajorFirmwareVersion(): " + firmware.getMajorFirmwareVersion());
+                                        parts = new Part[3];
 				        parts[0] = new StringPartNoTransferEncoding("sid", sid);
 				        //parts[1] = new StringPartNoTransferEncoding(
 				        //		"ImportExportPassword", "");
