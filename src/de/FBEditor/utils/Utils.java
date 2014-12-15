@@ -69,9 +69,9 @@ public class Utils {
 			String data) {
 		boolean result = false;
 
-                // 14.12.2014
-               	FritzBoxFirmware firmware = null;
-                firmware = fbConnection.getFirmware();
+               // 14.12.2014
+               FritzBoxFirmware firmware = null;
+               firmware = fbConnection.getFirmware();
 
 		try {
 			String url = (new StringBuilder("http://")).append(box_address)
