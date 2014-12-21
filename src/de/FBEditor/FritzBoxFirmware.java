@@ -215,6 +215,8 @@ public class FritzBoxFirmware {
              return "FRITZ!Box 7272";
             case 121:
              return "FRITZ!Box 3390";
+            case 123:
+             return "FRITZ!Box 6842 LTE";
             case 124:
              return "FRITZ!Box 7360";
             case 125:
@@ -223,6 +225,12 @@ public class FritzBoxFirmware {
              return "FRITZ!Box 3272";
             case 131:
              return "FRITZ!Box 7362 SL";
+            case 137:
+             return "FRITZ!Box 7412";
+            case 140:
+             return "FRITZ!Box 3490";
+            case 141:
+             return "FRITZ!Box 6490 Cable";
             default:
              return "unknown";
            }
