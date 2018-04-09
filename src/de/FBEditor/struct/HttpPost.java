@@ -65,16 +65,17 @@ public class HttpPost {
    Debug.debug("HttpURLConnection postdata: " + postdata);
    Debug.debug("HttpURLConnection getResponseCode: " + connection.getResponseCode());
    Debug.debug("HttpURLConnection getContentType: " + connection.getContentType());
-   
+
    String contentType = connection.getContentType();
    int encodingStart = contentType.indexOf("charset=");
    if (encodingStart != -1) {
     encoding = contentType.substring(encodingStart + 8);
     Debug.debug("HttpURLConnection encoding: " + encoding + " -> " + encoding.replace(";", ""));
    }
-   
+
    encoding = encoding.replace(";", ""); // ; wird zurück gegeben und verursacht einen Fehler
-   
+   encoding = encoding.replace("\"", ""); // " wird zurück gegeben und verursacht einen Fehler 08.08.2015
+
 //   System.out.println( encoding );
 
    if (connection.getResponseCode() == 200) {
@@ -162,9 +163,10 @@ public class HttpPost {
     encoding = contentType.substring(encodingStart + 8);
     Debug.debug("HttpURLConnection2 encoding: " + encoding + " -> " + encoding.replace(";", ""));
    }
-   
+
    encoding = encoding.replace(";", ""); // ; wird zurück gegeben und verursacht einen Fehler
-   
+   encoding = encoding.replace("\"", ""); // " wird zurück gegeben und verursacht einen Fehler 08.08.2015
+
 //   System.out.println( encoding );
 
    if (connection.getResponseCode() == 200) {
