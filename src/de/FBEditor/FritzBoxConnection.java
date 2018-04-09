@@ -50,7 +50,7 @@ public final class FritzBoxConnection {
 	private void updateURLstr(String boxAddress) {
 		urlstr = "http://" + boxAddress + "/cgi-bin/webcm";
 		urlstr1 = urlstr;
-		urlstr2 = "http://" + boxAddress;
+        urlstr2 = "http://" + boxAddress;
 	}
 
 	void getAccessMethod() {
@@ -60,19 +60,17 @@ public final class FritzBoxConnection {
 		Boolean speedport = false;
 		boolean detected = false;
 
-//		SIDLogin.check("", urlstr1, box_password, box_username, sRetSID);
-//		sRetSID = SIDLogin.getSessionId();
-
 		SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
 		sRetSID = SIDLogin.getSessionId();
 
 		FBFWVN fbfwvn = new FBFWVN(getFirmwareStatus());
-		// FBFWVN fbfwvn = new
-		// FBFWVN("<html><body>FRITZ!Box Fon WLAN 7362 SL-B-101100-000008-630046-320710-787902-1310601-12345-avm-de</body></html>");
 
 		if (SIDLogin.isSidLogin()) {
 			if (fbfwvn.isOK()) {
 				detected = true;
+			} else {
+				// 15.04.2015
+				if (sRetSID != "0000000000000000") detected = true;
 			}
 
 		} else if (SIDLogin.isLogin()) {
@@ -109,12 +107,12 @@ public final class FritzBoxConnection {
 
 			HttpPost http = new HttpPost();
 			boolean isQueryOld = false;
-			boolean isQueryLua = false;
+            boolean isQueryLua = false;
 			String url = urlstr;
-			String sLink;
+            String sLink;
 			String sRetQueryOld;
 			String sRetQueryNew;
-			String sRetQueryLua;
+            String sRetQueryLua;
 			postdata = "sid=" + sRetSID + "&"
 					+ "getpage=../html/query.txt&var:cnt=1" + "&var:n" + "0"
 					+ "=" + "logic:status/nspver";
@@ -132,23 +130,23 @@ public final class FritzBoxConnection {
 			}
 
 			if (sRetQueryOld.length() == sRetQueryNew.length()) {
-				sLink = "/query.lua" + "?" + "sid=" + sRetSID + "&nspver=" + "logic:status/nspver";
-				sRetQueryLua = http.Post(urlstr2 + sLink, "");
-				int nRet = 0;
-				nRet = FbQueryLua.sQueryLuaAll(sRetQueryLua, "nspver=logic:status/nspver", "nspver", "", 1);
-				if (nRet == 1) {
-					data = FbQueryLua.sQueryLuaAllsRetValue();
-					sRetQueryLua = data;
-					isQueryLua = true;
-				} else { 
-					data = "0.0.0";
-				}
-				System.out.println(urlstr2 + sLink);
-				System.out.println("QueryLua: " + isQueryLua + "     " + sRetQueryLua.replace("\n", ""));
-				//System.out.println("");
-			} else {
-				System.out.println(url);
-			}
+                sLink = "/query.lua" + "?" + "sid=" + sRetSID + "&nspver=" + "logic:status/nspver";
+                sRetQueryLua = http.Post(urlstr2 + sLink, "");
+                int nRet = 0;
+                nRet = FbQueryLua.sQueryLuaAll(sRetQueryLua, "nspver=logic:status/nspver", "nspver", "", 1);
+                if (nRet == 1) {
+                    data = FbQueryLua.sQueryLuaAllsRetValue();
+                    sRetQueryLua = data;
+                    isQueryLua = true;
+                } else { 
+                    data = "0.0.0";
+                }
+                System.out.println(urlstr2 + sLink);
+                System.out.println("QueryLua: " + isQueryLua + "     " + sRetQueryLua.replace("\n", ""));
+            //System.out.println("");
+            } else {
+                System.out.println(url);
+            }
 
 //			System.out.println(url);
 			System.out.println("QueryOld: " + isQueryOld + "     "
