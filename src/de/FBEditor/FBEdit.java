@@ -48,7 +48,7 @@ import de.FBEditor.utils.Utils;
 public class FBEdit extends JFrame implements Runnable
 
 {
-	private static final String version = "0.6.9.6";
+	private static final String version = "0.6.9.7"; // 19.04.2015
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
 	public static FritzBoxConnection fbConnection = null;
@@ -112,7 +112,14 @@ public class FBEdit extends JFrame implements Runnable
 
 			box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
 //			System.out.println("box.ConfigImExPwd: " + box_ConfigImExPwd);
-
+/*
+			System.out.println("box.address: " + box_address);
+			System.out.println("box.password: " + box_password);
+			System.out.println("box.username: " + box_username);
+			System.out.println("readOnStartup: " + readOnStartup);
+			System.out.println("NoChecks: " + NoChecks);
+			System.out.println("language: " + language);
+*/
 			setLocation(Integer.parseInt(position_left.trim()),
 					Integer.parseInt(position_top.trim()));
 			setSize(Integer.parseInt(position_width.trim()),
@@ -299,6 +306,7 @@ public class FBEdit extends JFrame implements Runnable
 	// Editor mit Inhalt füllen
 	public void setData(String data) {
 		JTextPane2 pane2 = this.getJTextPane();
+
 		pane2.setText("");
 // Consolas Font Pack for Microsoft Visual Studio 2005 or 2008
 // Download: http://www.microsoft.com/en-us/download/details.aspx?id=17879
@@ -462,18 +470,17 @@ public class FBEdit extends JFrame implements Runnable
 				FBEdit.getMessage("settings.ConfigImExPwd"), box_ConfigImExPwd);
 		if (new_box_ConfigImExPwd != null && !new_box_ConfigImExPwd.equals(box_ConfigImExPwd)) {
 			box_ConfigImExPwd = new_box_ConfigImExPwd;
-
 		}
 		
 		if (new_box_ConfigImExPwd != null) {
 			//box_isConfigImExPwdOk = true;
 			setConfigImExPwdOk(true);
 			System.out.println("new_box_ConfigImExPwd true: " + isConfigImExPwdOk());
-		} else if (new_box_ConfigImExPwd == null) {	
-			//box_isConfigImExPwdOk = false;
-			setConfigImExPwdOk(false);
-			System.out.println("new_box_ConfigImExPwd false: " + isConfigImExPwdOk());
-		}
+	    } else if (new_box_ConfigImExPwd == null) {	
+		    //box_isConfigImExPwdOk = false;
+	    	setConfigImExPwdOk(false);
+	        System.out.println("new_box_ConfigImExPwd false: " + isConfigImExPwdOk());
+	    }
 
 		System.out.println("new_box_ConfigImExPwd: " + new_box_ConfigImExPwd + " -> " + isConfigImExPwdOk());
 
@@ -502,12 +509,12 @@ public class FBEdit extends JFrame implements Runnable
 		return INSTANCE;
 	}
 
-	private static void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException ignored) {
-		}
-	}       
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
+        }
+    }       
 
 	public static void main(String[] s) {
 		FBEdit fbedit = new FBEdit();
@@ -528,7 +535,7 @@ public class FBEdit extends JFrame implements Runnable
 
 		fbedit.thread.start(); // Korrektur Statuszeile geht sonst nicht
 
-		sleep(2000);
+	        sleep(2000);
 
 		makeNewConnection(true);
 
@@ -568,13 +575,12 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	public void setbox_ConfigImExPwd(String boxConfigImExPwd) {
-		box_ConfigImExPwd = boxConfigImExPwd;
-		properties.setProperty("box.ConfigImExPwd", box_ConfigImExPwd);
-		System.out.println("Set box.ConfigImExPwd: " + box_ConfigImExPwd);
+	    box_ConfigImExPwd = boxConfigImExPwd;
+	    properties.setProperty("box.ConfigImExPwd", box_ConfigImExPwd);
+	    System.out.println("Set box.ConfigImExPwd: " + box_ConfigImExPwd);
 	}
 
 	public String getbox_ConfigImExPwd() {
-//		box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
 		return box_ConfigImExPwd;
 	}
 	public static boolean isConfigImExPwdOk() {
