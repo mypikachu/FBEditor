@@ -56,7 +56,11 @@ public class FBFWVN {
   isOK = false;
   isFritzboxLanguageOK = false;
 
-  Pattern status1Pattern = Pattern.compile("<body>([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^<]*)</body>", Pattern.CASE_INSENSITIVE);
+// 15.04.2015
+  int ii = 0;
+  String ss = "";
+
+  Pattern status1Pattern = Pattern.compile("<body>([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)-([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^-<]*)[|-]?([^<]*)</body>", Pattern.CASE_INSENSITIVE);
   Matcher status1Matcher = status1Pattern.matcher(sFBFWV_IN);
 
   if (status1Matcher.find(0) == true) {
@@ -66,8 +70,9 @@ public class FBFWVN {
    if (status1Matcher.groupCount() >= 9) {
 
     for (int i = 0; i <= status1Matcher.groupCount(); i++) {
-     S10[i] = status1Matcher.group(i);
-     //System.out.println( S10[i]);
+     // 15.04.2015
+     ss = status1Matcher.group(i);
+     S10[i - ii] = ss;
     }
 
     if (S10[8].length() >= 5) {
@@ -87,14 +92,23 @@ public class FBFWVN {
      if (status1Matcher.groupCount() >= 10) {
       sFBFWV100 = S10[10];
      }
+     // 15.08.2015
      if (status1Matcher.groupCount() >= 11) {
+      if (!"".equals(S10[11]) && S10[11].length() > 2) {
+       S10[11] = S10[11].substring(0, 2);
+      }
       sFBFWV110 = S10[11];
       if (!"".equals(S10[11]) && S10[11].length() == 2) {
        isFritzboxLanguageOK = true;
       }
      }
 
-     isOK = true;
+     // 15.04.2015
+     if (sFBFWV81.length() > 3) {
+   	  System.out.println("isOK = false");
+     } else {
+   	  isOK = true;
+     }
 
     }
    }
