@@ -53,7 +53,7 @@ public class Debug {
 	private static JButton close_button;
 	private static JButton save_button;
 	private static JButton refresh_button;
-	private static JComboBox log_severity_box;
+	private static JComboBox<?> log_severity_box;
 
 	/**
 	 * Turns debug-mode on

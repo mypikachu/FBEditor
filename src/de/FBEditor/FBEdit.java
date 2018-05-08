@@ -29,6 +29,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager; // Sorry nur für den Mac
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
@@ -39,16 +40,20 @@ import de.FBEditor.struct.ExampleFileFilter;
 import de.FBEditor.struct.JTextPane2;
 import de.FBEditor.struct.MyProperties;
 import de.FBEditor.struct.OverwriteCaret;
+import de.FBEditor.struct.SIDLogin;
 import de.FBEditor.utils.CalcChecksum;
 import de.FBEditor.utils.Debug;
 import de.FBEditor.utils.Encryption;
 import de.FBEditor.utils.Listener;
 import de.FBEditor.utils.Utils;
+import de.FBEditor.utils.upnp.UPNPUtils;
 
 public class FBEdit extends JFrame implements Runnable
 
 {
-	private static final String version = "0.6.9.7"; // 19.04.2015
+//	private static final String version = "0.6.9.7"; // 19.04.2015
+	private static final String version = "0.6.9.7c"; // 19.04.2015 "0.6.9.7" / 27.04.2018 / 05.05.2018 Bug Fix Java 9/10
+
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
 	public static FritzBoxConnection fbConnection = null;
@@ -88,11 +93,44 @@ public class FBEdit extends JFrame implements Runnable
 	private static Vector<Locale> supported_languages;
 	private static ResourceBundle messages;
 	private static ResourceBundle en_messages;
+	
+	private boolean macos = false; // 27.04.2018
 
+	@SuppressWarnings("unlikely-arg-type")
 	public FBEdit() {
 		
 		String jvm_version = System.getProperty("java.version");
-		
+
+// 27.04.2018
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.contains("win")){
+		    //Betriebssystem ist Windows-basiert
+			System.out.println("OS: " + os);
+		}
+		else if (os.contains("osx")){
+		    //Betriebssystem ist Apple OSX
+			System.out.println("OS: " + os);
+			macos = true;
+		}      
+		else if (os.contains("nix") || os.contains("aix") || os.contains("nux")){
+		    //Betriebssystem ist Linux/Unix basiert
+			System.out.println("OS: " + os);
+		}
+
+// 27.04.2018
+		if (macos){
+			// Sorry nur für den Mac
+			// Try to set a more native look and feel on supported platforms
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "AgentX");
+			} catch (final Exception e) {
+				//TODO catch exception
+				e.printStackTrace();
+			}
+		}
+
 		// Try to load and set properties
 		properties = new MyProperties();
 		Utils.createDefaultProperties(properties); // Set Properties Default Values // 22.02.2014
@@ -132,8 +170,6 @@ public class FBEdit extends JFrame implements Runnable
 
 		updateTitle();
 		setIconImage(getImageFromJAR("/icon.gif"));
-
-		pane = new JTextPane2();
 
 		setProperties(properties);
 
@@ -183,6 +219,7 @@ public class FBEdit extends JFrame implements Runnable
 			getPassword(true);
 		}
 
+		pane = new JTextPane2();
 		undoManager = new CompoundUndoManager(pane);
 		action = new ActionListen(this);
 		cutAndPaste = new CutAndPastePopup(action);
@@ -306,13 +343,13 @@ public class FBEdit extends JFrame implements Runnable
 	// Editor mit Inhalt füllen
 	public void setData(String data) {
 		JTextPane2 pane2 = this.getJTextPane();
-
-		pane2.setText("");
+//		pane2.setText(""); // Absturz in Java 9/10 / 05.05.2018
 // Consolas Font Pack for Microsoft Visual Studio 2005 or 2008
 // Download: http://www.microsoft.com/en-us/download/details.aspx?id=17879
 		pane2.setFont(new Font("Consolas", 0, 12));
 		pane2.setEditable(false);
 		undoManager.pause();
+		pane2.setText(""); // 05.05.2018
 		pane2.setText(data);
 		pane2.setCaretPosition(0);
 		undoManager.resume();
@@ -340,6 +377,7 @@ public class FBEdit extends JFrame implements Runnable
 				}
 				boolean result = false;
 				result = Utils.exportData(getframe(), getbox_address(), text);
+				if (result) setData(new String(text)); // 27.04.2018
 				if (result)
 					JOptionPane.showMessageDialog(this,
 							FBEdit.getMessage("box.restart"),
@@ -402,6 +440,7 @@ public class FBEdit extends JFrame implements Runnable
 	    		String text = CalcChecksum.replaceChecksum(pane2.getText());
     			pfos.print(text);
 	    		fos.close();
+	    		setData(new String(text)); // 27.04.2018
     		} catch (IOException e) {
 	    		JOptionPane.showMessageDialog(this.getframe(),
 		    			FBEdit.getMessage("export.save.error"),
@@ -503,6 +542,14 @@ public class FBEdit extends JFrame implements Runnable
 		myMenu.reconnect.setEnabled(false);
 	}
 
+	public void enableMenu2FA(boolean bool) { // 27.04.2018 2FA Active
+		// After settings restore only reconnect is allowed
+		myMenu.hardmenu.setEnabled(bool);
+		myMenu.importcfg.setEnabled(false);
+		myMenu.exportcfg.setEnabled(bool);
+		myMenu.reconnect.setEnabled(true);
+	}
+
 	public static FBEdit getInstance() {
 		if (INSTANCE == null)
 			INSTANCE = new FBEdit();
@@ -535,7 +582,9 @@ public class FBEdit extends JFrame implements Runnable
 
 		fbedit.thread.start(); // Korrektur Statuszeile geht sonst nicht
 
-	        sleep(2000);
+		//Debug.always("sleep: 0");
+		sleep(2000);
+		//Debug.always("sleep: 1");
 
 		makeNewConnection(true);
 
@@ -549,10 +598,12 @@ public class FBEdit extends JFrame implements Runnable
 		if (fbConnection.isConnected()) {
 			firmware = fbConnection.getFirmware();
 			if (firmware.getMajorFirmwareVersion() == 4
-					|| firmware.getMajorFirmwareVersion() >= 5) // ab Firmware xxx.05.xx / xxx.06.xx
+					|| firmware.getMajorFirmwareVersion() >= 5) { // ab Firmware xxx.05.xx / xxx.06.xx
 				FBEdit.getInstance().enableMenu(true);
-			else
+				FBEdit.getInstance().setData(new String(FBEdit.getInstance().getupnp2FAsid())); // 27.04.2018
+			} else {
 				FBEdit.getInstance().enableMenu(false);
+			}
 			if (firstStart && Boolean.parseBoolean(readOnStartup))
 				FBEdit.getInstance().getFile();
 		} else {
@@ -581,6 +632,7 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	public String getbox_ConfigImExPwd() {
+//		box_ConfigImExPwd = properties.getProperty("box.ConfigImExPwd", "");
 		return box_ConfigImExPwd;
 	}
 	public static boolean isConfigImExPwdOk() {
@@ -772,5 +824,23 @@ public class FBEdit extends JFrame implements Runnable
 			i18n = en_messages.getString(msg);
 		}
 		return i18n;
+	}
+	
+	public String getupnp2FAsid() {
+
+		String s2FA = "";
+
+		if (SIDLogin.isSidLoginLua()) {
+
+			s2FA = UPNPUtils.get2FAUPNP();
+		
+			if (s2FA.equals("1")) {
+				FBEdit.getInstance().enableMenu2FA(true);
+				return  "Box Login " + FBEdit.getMessage("main.error") + "!" + " -> " + "2FA is Active" + "\n"; // Aktiv / Active / Activo / Attivo
+			}
+		
+		}
+//		return "sid=" + UPNPUtils.getSIDUPNP() + "\n" + "2FA -> " + UPNPUtils.get2FAUPNP() + "\n";
+		return "";
 	}
 }
