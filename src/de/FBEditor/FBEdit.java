@@ -52,7 +52,8 @@ public class FBEdit extends JFrame implements Runnable
 
 {
 //	private static final String version = "0.6.9.7"; // 19.04.2015
-	private static final String version = "0.6.9.7c"; // 19.04.2015 "0.6.9.7" / 27.04.2018 / 05.05.2018 Bug Fix Java 9/10
+//	private static final String version = "0.6.9.7c"; // 19.04.2015 "0.6.9.7" / 27.04.2018 / 05.05.2018 Bug Fix Java 9/10
+	private static final String version = "0.6.9.7d"; // 22.06.2018 "0.6.9.7" language Italien
 
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
@@ -96,7 +97,6 @@ public class FBEdit extends JFrame implements Runnable
 	
 	private boolean macos = false; // 27.04.2018
 
-	@SuppressWarnings("unlikely-arg-type")
 	public FBEdit() {
 		
 		String jvm_version = System.getProperty("java.version");
@@ -178,7 +178,8 @@ public class FBEdit extends JFrame implements Runnable
 
 		Debug.always("OS Language: " + System.getProperty("user.language"));
 		Debug.always("OS Country: " + System.getProperty("user.country"));
-		if (language == null || language.equals(false)) {
+
+		if (language == null || !language.equals(System.getProperty("user.language") + "_" + System.getProperty("user.country"))) { // 22.06.2018
 			Debug.info("No language set yet ... Setting language to OS language");
 			// Check if language is supported. If not switch to English
 			if (supported_languages.contains(new Locale(System
@@ -205,7 +206,7 @@ public class FBEdit extends JFrame implements Runnable
 		try {
 			font = Font.createFont( Font.TRUETYPE_FONT, getClass().getResourceAsStream( "/de/FBEditor/font/Consola.ttf") );
 			GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont( font );
-			System.out.println("Font: : " + font.getName());
+			System.out.println("Font: " + font.getName());
 		} catch (FontFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -600,7 +601,9 @@ public class FBEdit extends JFrame implements Runnable
 			if (firmware.getMajorFirmwareVersion() == 4
 					|| firmware.getMajorFirmwareVersion() >= 5) { // ab Firmware xxx.05.xx / xxx.06.xx
 				FBEdit.getInstance().enableMenu(true);
-				FBEdit.getInstance().setData(new String(FBEdit.getInstance().getupnp2FAsid())); // 27.04.2018
+				// FBEdit.getInstance().setData(new String(FBEdit.getInstance().getupnp2FAsid())); // 27.04.2018
+				// Bei setData hier haengt sich der Dialog auf
+				FBEdit.getInstance().getupnp2FAsid(); // 22.06.2018
 			} else {
 				FBEdit.getInstance().enableMenu(false);
 			}
@@ -778,9 +781,9 @@ public class FBEdit extends JFrame implements Runnable
 		supported_languages.add(new Locale("de", "DE"));
 		supported_languages.add(new Locale("en", "US"));
 		supported_languages.add(new Locale("es", "ES"));
+		supported_languages.add(new Locale("it", "IT")); // 22.06.2018
 
 		/*
-		 * supported_languages.add(new Locale("it","IT"));
 		 * supported_languages.add(new Locale("nl","NL"));
 		 * supported_languages.add(new Locale("pl","PL"));
 		 * supported_languages.add(new Locale("ru","RU"));
