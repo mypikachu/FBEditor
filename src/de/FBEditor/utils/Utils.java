@@ -196,6 +196,7 @@ public class Utils {
 //		properties.setProperty("NoChecks", "true"); // 17.02.2014
 		properties.setProperty("NoChecks", "false"); // 17.02.2014
 		properties.setProperty("language", "de_DE");
+		properties.setProperty("language.setting.manuell", "no"); // 25.06.2018
 
 		return true;
 	}
@@ -219,6 +220,7 @@ public class Utils {
 //			properties.setProperty("NoChecks", "true"); // 17.02.2014
 			properties.setProperty("NoChecks", "false"); // 17.02.2014
 			properties.setProperty("language", "de_DE");
+			properties.setProperty("language.setting.manuell", "no"); // 25.06.2018
 		} catch (Exception exception) {
 		}
 		return false;
@@ -242,6 +244,7 @@ public class Utils {
 		properties.setProperty("readOnStartup", fbedit.getRASstate());
 		properties.setProperty("NoChecks", fbedit.getNoChecksState());
 		properties.setProperty("language", fbedit.getLanguage());
+		properties.setProperty("language.setting.manuell", fbedit.getLanguageManuell()); // 25.06.2018
 		try {
 			FileOutputStream fos = new FileOutputStream(PROPERTIES_FILE);
 			properties.storeToXML(fos, "Properties for FBEditor");
