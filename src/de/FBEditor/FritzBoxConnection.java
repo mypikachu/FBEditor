@@ -1,16 +1,18 @@
 package de.FBEditor;
 
-import de.FBEditor.struct.FBFWVN;
-import de.FBEditor.struct.HttpPost;
-import de.FBEditor.struct.SIDLogin;
-import de.FBEditor.struct.FbQueryLua;
-import de.FBEditor.utils.Utils;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.JOptionPane;
+
+import de.FBEditor.struct.FBFWVN;
+import de.FBEditor.struct.FbQueryLua;
+import de.FBEditor.struct.HttpPost;
+import de.FBEditor.struct.SIDLogin;
+import de.FBEditor.utils.Utils;
 
 /**
  * Class holding connection information
@@ -60,7 +62,13 @@ public final class FritzBoxConnection {
 		Boolean speedport = false;
 		boolean detected = false;
 
-		SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
+//		SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
+		System.out.println("LoginLua: " + FBEdit.getInstance().getBoxLoginLuaState());
+		if (FBEdit.getInstance().getBoxLoginLuaState().equalsIgnoreCase("true")) { // 25.06.2018
+			SIDLogin.LoginLua("", urlstr1, box_password, box_username, sRetSID);
+		} else {
+			SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
+		}
 		sRetSID = SIDLogin.getSessionId();
 
 		FBFWVN fbfwvn = new FBFWVN(getFirmwareStatus());
@@ -198,7 +206,11 @@ public final class FritzBoxConnection {
 			this.box_username = box_username;
 			if (Utils.checkhost(box_address)) {
 				sRetSID = SIDLogin.getSessionId();
-				SIDLogin.check("", urlstr1, box_password, box_username, sRetSID);
+				if (FBEdit.getInstance().getBoxLoginLuaState().equalsIgnoreCase("true")) { // 25.06.2018
+					SIDLogin.LoginLua("", urlstr1, box_password, box_username, sRetSID);
+				} else {
+					SIDLogin.Login("", urlstr1, box_password, box_username, sRetSID);
+				}
 				sRetSID = SIDLogin.getSessionId();
 				if (SIDLogin.isSidLogin()) {
 					result = true;
