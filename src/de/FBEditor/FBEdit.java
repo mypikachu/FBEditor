@@ -56,7 +56,8 @@ public class FBEdit extends JFrame implements Runnable
 //	private static final String version = "0.6.9.7d"; // 22.06.2018 "0.6.9.7" language Italien
 //	private static final String version = "0.6.9.7e"; // 23.06.2018 "0.6.9.7" Fixed typo error language Italien
 //	private static final String version = "0.6.9.7f"; // 25.06.2018 "0.6.9.7" Fix language Italien
-	private static final String version = "0.6.9.7g"; // 25.06.2018 "0.6.9.7" language setting manuell
+//	private static final String version = "0.6.9.7g"; // 25.06.2018 "0.6.9.7" language setting manuell
+	private static final String version = "0.6.9.7h"; // 25.06.2018 "0.6.9.7" Program Start Dialog
 
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
@@ -75,10 +76,12 @@ public class FBEdit extends JFrame implements Runnable
 	private static String box_username = "";
 	private static String box_ConfigImExPwd = "";
 	private static boolean box_isConfigImExPwdOk = false;
+	private static String box_login_lua = "false"; // 25.06.2018 true or false Box Login Lua ab Firmware Version xxx.05.50
 	private static String readOnStartup = "false";
 	private static String NoChecks = "false";
 	private static String language = "false";
 	private static String language_manuell = "no"; // 25.06.2018 no or yes Setting Language Manuell
+	private static String ProgramStartDialog = "false"; // 25.06.2018 true or false Program Start Dialog
 
 	private static MyProperties properties;
 	private final CompoundUndoManager undoManager;
@@ -239,6 +242,9 @@ public class FBEdit extends JFrame implements Runnable
 		if (!(loadProp)) {
 			getHost(true);
 			getPassword(true);
+			getUsername(true); // 25.06.2018
+		} else if (loadProp) { // 25.06.2018
+			programStartDialog(loadProp);
 		}
 
 		pane = new JTextPane2();
@@ -271,12 +277,14 @@ public class FBEdit extends JFrame implements Runnable
 
 	private void setProperties(MyProperties properties) {
 		box_address = properties.getProperty("box.address");
-		box_password = Encryption.decrypt(properties
-				.getProperty("box.password"));
+		box_password = Encryption.decrypt(properties.getProperty("box.password"));
 		box_username = properties.getProperty("box.username");
 		readOnStartup = properties.getProperty("readOnStartup");
 		NoChecks = properties.getProperty("NoChecks");
 		language = properties.getProperty("language");
+		language_manuell = properties.getProperty("language.setting.manuell"); // 25.06.2018
+		ProgramStartDialog = properties.getProperty("program.start.dialog"); // 25.06.2018
+		box_login_lua = properties.getProperty("box.login.lua"); // 25.06.2018
 	}
 
 	// Dateiname im Titel und Cursor Position setzen
@@ -776,8 +784,52 @@ public class FBEdit extends JFrame implements Runnable
 		language_manuell = languageM;
 	}
 
-	public String getLanguageManuell() { // 25.06.2018
+	public String getLanguageManuellState() { // 25.06.2018
 		return language_manuell;
+	}
+
+	// 25.06.2018 true or false Program Start Dialog
+	public static void setProgramStartDialog(String PSD) {
+		ProgramStartDialog = PSD;
+	}
+
+	public String getProgramStartDialogState() { // 25.06.2018
+		return ProgramStartDialog;
+	}
+
+	void programStartDialog(boolean first) { // 25.06.2018
+		if (ProgramStartDialog.equalsIgnoreCase("true")) { 
+			if (first) {
+				getHost(true);
+				getPassword(true);
+				getUsername(true);
+//				getConfigImExPwd(true);
+			}
+		}
+	}
+
+	/* Program Start Dialog setzen */
+	public void changeProgramStartDialog() { // 25.06.2018
+		if (ProgramStartDialog.equalsIgnoreCase("true"))
+			ProgramStartDialog = "false";
+		else
+			ProgramStartDialog = "true";
+
+		myMenu.ProgramStartDialog.setState(Boolean.parseBoolean(ProgramStartDialog));
+	}
+
+	public String getBoxLoginLuaState() { // 25.06.2018
+		return box_login_lua;
+	}
+
+	/* Box Login Lua setzen */
+	public void changeBoxLoginLua() { // 25.06.2018
+		if (box_login_lua.equalsIgnoreCase("true"))
+			box_login_lua = "false";
+		else
+			box_login_lua = "true";
+
+		myMenu.box_login_lua.setState(Boolean.parseBoolean(box_login_lua));
 	}
 
 	/* NoChecks setzen */
@@ -869,7 +921,8 @@ public class FBEdit extends JFrame implements Runnable
 		
 			if (s2FA.equals("1")) {
 				FBEdit.getInstance().enableMenu2FA(true);
-				return  "Box Login " + FBEdit.getMessage("main.error") + "!" + " -> " + "2FA is Active" + "\n"; // Aktiv / Active / Activo / Attivo
+//				return  "Box Login " + FBEdit.getMessage("main.error") + "!" + " -> " + "2FA is Active" + "\n"; // Aktiv / Active / Activo / Attivo
+				return  "Box Login " + FBEdit.getMessage("main.error") + "!" + " -> " + FBEdit.getMessage("main.2fa_is_active") + "\n" + "\n" + FBEdit.getMessage("main.2fa_info") + "\n"; // 25.06.2018
 			}
 		
 		}
