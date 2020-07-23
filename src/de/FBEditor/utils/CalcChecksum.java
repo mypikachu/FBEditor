@@ -44,6 +44,11 @@ public class CalcChecksum {
 				type = 5;
 			} else {
 				if (Utils.pMatch("\\*\\*\\*\\* (.+) CONFIGURATION EXPORT", line, 0) != null) {
+					file = false;
+					Debug.debug(line);
+					type = 3;
+					return;
+				}
 				if (Utils.pMatch("\\*\\*\\*\\* END OF EXPORT (.*?)", line, 0) != null) {
 					expected = line.substring(19, 27);
 					Debug.debug(line);
@@ -103,6 +108,17 @@ public class CalcChecksum {
 					bin_line += (char) Integer.parseInt(hex.substring(i, i + 2), 16);
 				}
 				updateCRC(bin_line);
+
+				return;
+			}
+			if (type == 5) {  // base64 file
+				if (line.indexOf("**** END OF FILE") == 0) {
+					type = 0;
+					return;
+				}
+				String base64 = line.trim().replace("\n", "");
+				byte[] dec = Base64.decodeBase64(base64.getBytes());
+				crc.update(dec);
 
 				return;
 			}
