@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
+import org.apache.commons.codec.binary.Base64;
 
 public class CalcChecksum {
 	
@@ -37,13 +38,12 @@ public class CalcChecksum {
 				Debug.debug(line);
 				type = 4;
 				// CRYPTEDBINFILE bin file 19.04.2015
+			} else if ((filename = Utils.pMatch("\\*\\*\\*\\* B64FILE:(.*?)$", line, 1)) != null) {
+				file = true;
+				Debug.debug(line);
+				type = 5;
 			} else {
 				if (Utils.pMatch("\\*\\*\\*\\* (.+) CONFIGURATION EXPORT", line, 0) != null) {
-					file = false;
-					Debug.debug(line);
-					type = 3;
-					return;
-				}
 				if (Utils.pMatch("\\*\\*\\*\\* END OF EXPORT (.*?)", line, 0) != null) {
 					expected = line.substring(19, 27);
 					Debug.debug(line);
