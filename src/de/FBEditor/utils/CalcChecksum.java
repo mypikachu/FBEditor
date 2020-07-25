@@ -1,6 +1,7 @@
 package de.FBEditor.utils;
 
 import java.io.UnsupportedEncodingException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -112,15 +113,15 @@ public class CalcChecksum {
 				return;
 			}
 			if (type == 5) {  // base64 file
-				if (line.indexOf("**** END OF FILE") == 0) {
-					type = 0;
-					return;
-				}
-				String base64 = line.trim().replace("\n", "");
-				byte[] dec = Base64.decodeBase64(base64.getBytes());
-				crc.update(dec);
+					if (line.indexOf("**** END OF FILE") == 0) {
+						type = 0;
+						return;
+					}
+					String base64 = line.trim().replace("\n", "");
+					byte[] dec = Base64.decodeBase64(base64.getBytes());
+					crc.update(dec);
 
-				return;
+					return;
 			}
 			if (type == 3) { // variable (remove "=", add '\0' to the end
 				if (line.indexOf("****") != -1) {
@@ -187,10 +188,13 @@ public class CalcChecksum {
 			CalcChecksum exportsumme = new CalcChecksum();
 			String newChecksum = Long.toHexString(exportsumme.getChecksum(text));
 			newChecksum = newChecksum.toUpperCase();
-			if (!CalcChecksum.getchecksum())
+			if (!CalcChecksum.getchecksum()) { // 25.07.2020
+				if (newChecksum.length() < 8)
+					newChecksum = '0' + newChecksum;
 				newText = text.replace(checksum, newChecksum);
-			else
+			} else {
 				newText = text;
+			}
 		} else {
 			newText = text;
 		}
