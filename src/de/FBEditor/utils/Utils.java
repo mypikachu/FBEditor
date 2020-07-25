@@ -52,7 +52,8 @@ public class Utils {
 		try { // 04.07.2018
 			SocketAddress sockaddr = new InetSocketAddress(addr, port);
 			Socket test = new Socket();
-			int timeoutMs = 1000; // 1 second
+//			int timeoutMs = 1000; // 1 second
+			int timeoutMs = 2000; // 2 second
 			test.connect(sockaddr, timeoutMs);
 			test.close();
 			bool = true;
@@ -83,25 +84,32 @@ public class Utils {
 			String url = (new StringBuilder("http://")).append(box_address)
 					.append("/cgi-bin/firmwarecfg").toString();
 			File uploadFile = createTempFile(data);
-
+/*
+			System.out.println("url: " + url);
+			System.out.println("uploadFile: " + uploadFile);
+			System.out.println("");
+			System.out.println("uploadFile data: " + data);
+			System.out.println("");
+*/
+//*
 			PostMethod mPost = new PostMethod(url);
 
-			// Kennwort der Sicherungsdatei
+	        // Kennwort der Sicherungsdatei
 			String ConfigImExPwd = "";
 			String box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
 			System.out.println("box.ConfigImExPwd: " + box_ConfigImExPwd);
 
 			if ( !"".equals(box_ConfigImExPwd) ) {
-				// Hier kann man ein PopUp Dialog verwenden
+	            // Hier kann man ein PopUp Dialog verwenden
 				// mit der Frage, mit oder ohne Kennwort Speichern
 
 				FBEdit.getInstance().getConfigImExPwd(false);
 
-				if ( FBEdit.isConfigImExPwdOk() == true ) {
-					box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
-					// ConfigImExPwd = ""; // Abbrechen -> ohne Kennwort
-					ConfigImExPwd = box_ConfigImExPwd; // OK -> mit Kennwort	
-				}
+	            if ( FBEdit.isConfigImExPwdOk() == true ) {
+			    	box_ConfigImExPwd = FBEdit.getInstance().getbox_ConfigImExPwd();
+		    		// ConfigImExPwd = ""; // Abbrechen -> ohne Kennwort
+	    			ConfigImExPwd = box_ConfigImExPwd; // OK -> mit Kennwort	
+	            }
 				System.out.println("ConfigImExPwd: " + ConfigImExPwd + " -> " + FBEdit.isConfigImExPwdOk());
 			}
 
@@ -116,7 +124,7 @@ public class Utils {
 					parts = new Part[4];
 					parts[0] = new StringPartNoTransferEncoding("sid", sid);
 					//parts[1] = new StringPartNoTransferEncoding(
-					//	"ImportExportPassword", "");
+					//      "ImportExportPassword", "");
 					parts[1] = new StringPartNoTransferEncoding(
 						"ImportExportPassword", ConfigImExPwd);
 					parts[2] = new FilePart("ConfigImportFile",
@@ -172,7 +180,7 @@ public class Utils {
 						FBEdit.getMessage("error"), 0);
 
 			mPost.releaseConnection();
-
+//*/
 		} catch (IOException ex) {
 			Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -279,6 +287,7 @@ public class Utils {
 	}
 
 	private static boolean checkResponse(String data) {
+		//return (data.indexOf("fehlgeschlagen") == -1);
 		return (!data.contains("fehlgeschlagen"));
 	}
 
