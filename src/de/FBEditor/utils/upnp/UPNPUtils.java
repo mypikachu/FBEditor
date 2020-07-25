@@ -21,7 +21,7 @@ import de.FBEditor.utils.Debug;
 /**
  * @author Arno Willig
  *
- * TODO: Bugfix: Exception if no UPNP enabled
+ *         TODO: Bugfix: Exception if no UPNP enabled
  */
 public class UPNPUtils {
 
@@ -29,21 +29,26 @@ public class UPNPUtils {
 	private static String URN_SERVICE_CREATEURLSID = "urn:dslforum-org:service:DeviceConfig:1#X_AVM-DE_CreateUrlSID"; // 01.08.2015
 
 	private static String URL_SERVICE_2FA = ":49000/upnp/control/x_auth"; // 27.04.2018
+	// private static String URL_SERVICE_2FA = ":49443/upnp/control/x_auth"; //
+	// 27.04.2018
 	private static String URN_SERVICE_2FA = "urn:dslforum-org:service:X_AVM-DE_Auth:1#GetInfo"; // 27.04.2018
 
 	private static String protocol = "http";
+	// private static String protocol = "https";
 	private static FBEdit fbe;
-	
+
 	public UPNPUtils() {
 	}
 
 	/**
-	 * function calls the web service specified by the url with the soap
-	 * envelope specified in xml
+	 * function calls the web service specified by the url with the soap envelope
+	 * specified in xml
 	 *
-	 * @param url of the web service
+	 * @param url
+	 *            of the web service
 	 * @param urn
-	 * @param xml soap element to be trasmitted
+	 * @param xml
+	 *            soap element to be trasmitted
 	 * @return
 	 */
 	public static String getSOAPData(String url, String urn, String xml) {
@@ -73,7 +78,7 @@ public class UPNPUtils {
 			uc.setRequestProperty("Connection", "Keep-Alive");
 			uc.setRequestProperty("CONTENT-LENGTH", String.valueOf(bytes.length));
 			uc.setRequestProperty("CONTENT-TYPE", //$NON-NLS-1$
-							"text/xml; charset=\"utf-8\""); //$NON-NLS-1$
+					"text/xml; charset=\"utf-8\""); //$NON-NLS-1$
 			uc.setRequestProperty("SOAPACTION", urn); //$NON-NLS-1$
 			uc.setRequestProperty("Connection", "close");
 
@@ -82,7 +87,7 @@ public class UPNPUtils {
 			printout.close();
 
 			if (uc.getResponseCode() == 200) {
-				//InputStream in = uc.getInputStream();
+				// InputStream in = uc.getInputStream();
 				d = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 
 				String str;
@@ -95,16 +100,16 @@ public class UPNPUtils {
 		} finally {
 
 			try {
-				if(d!=null)
+				if (d != null)
 					d.close();
-			}catch(IOException ioe){
+			} catch (IOException ioe) {
 				Debug.error("Error closing Stream");
 			}
 
 			try {
-				if(printout!=null)
+				if (printout != null)
 					printout.close();
-			}catch(IOException ioe){
+			} catch (IOException ioe) {
 				Debug.error("Error closing Stream");
 			}
 		}
@@ -118,23 +123,26 @@ public class UPNPUtils {
 		BufferedReader d = null;
 		DataOutputStream printout = null;
 
-		//String username = "@CompatMode"; String password = "0000"; // geht nicht
-		//String username = "boxuser100"; String password = "0000"; // geht nicht
-		//String username = "test"; String password = "0000"; // geht nur mit Benutzer Login
-		String username = FBEdit.getInstance().getbox_username(); String password = FBEdit.getInstance().getbox_password(); // geht nur mit Benutzer Login
-//		System.out.println("password 1: " + password);
-//		System.out.println("username 1: " + username);
-		
+		// String username = "@CompatMode"; String password = "0000"; // geht nicht
+		// String username = "boxuser100"; String password = "0000"; // geht nicht
+		// String username = "test"; String password = "0000"; // geht nur mit Benutzer
+		// Login
+		String username = FBEdit.getInstance().getbox_username();
+		String password = FBEdit.getInstance().getbox_password(); // geht nur mit Benutzer Login
+		// System.out.println("password 1: " + password);
+		// System.out.println("username 1: " + username);
+
 		try {
 			Authenticator.setDefault(new MyAuthenticator(username, password));
 			URL u = new URL(url);
 
-			//Debug.info("Result of DeviceConfig getSOAPDataAuth 1: " + u);
-			//Debug.info("Result of DeviceConfig getSOAPDataAuth u: " + username);
-			//Debug.info("Result of DeviceConfig getSOAPDataAuth p: " + password);
+			// Debug.info("Result of DeviceConfig getSOAPDataAuth 1: " + u);
+			// Debug.info("Result of DeviceConfig getSOAPDataAuth u: " + username);
+			// Debug.info("Result of DeviceConfig getSOAPDataAuth p: " + password);
 
 			HttpURLConnection uc = (HttpURLConnection) u.openConnection();
-			//uc.setRequestProperty("Authorization", "Basic " + getBasicAuthenticationEncoding(username, password));
+			// uc.setRequestProperty("Authorization", "Basic " +
+			// getBasicAuthenticationEncoding(username, password));
 			uc.setRequestMethod("POST");
 
 			// 5 Sekunden-Timeout für Verbindungsaufbau
@@ -160,86 +168,84 @@ public class UPNPUtils {
 			printout.write(bytes);
 			printout.close();
 
-			//Debug.info("Result of DeviceConfig getHeaderFields: " + uc.getHeaderFields());
+			// Debug.info("Result of DeviceConfig getHeaderFields: " +
+			// uc.getHeaderFields());
 
-			//InputStream in = uc.getInputStream();
-			d = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+			if (uc.getResponseCode() == 200) {
+				// InputStream in = uc.getInputStream();
+				d = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 
-			String str;
-			while (null != ((str = d.readLine())))
-				data += str + "\n";
+				String str;
+				while (null != ((str = d.readLine())))
+					data += str + "\n";
+			}
 
 		} catch (IOException e) {
 			Debug.error(e.toString());
-		}finally{
-			try{
-				if(d!=null)
+		} finally {
+			try {
+				if (d != null)
 					d.close();
-			}catch(IOException ioe){
+			} catch (IOException ioe) {
 				Debug.error("Error closing Stream");
 			}
-			try{
-				if(printout!=null)
+			try {
+				if (printout != null)
 					printout.close();
-			}catch(IOException ioe){
+			} catch (IOException ioe) {
 				Debug.error("Error closing Stream");
 			}
 		}
-		//Debug.info("Result of DeviceConfig data 1: " + data);
+		// Debug.info("Result of DeviceConfig data 1: " + data);
 		return data;
 	}
 
 	// 01.08.2015 pikachu // 27.04.2018 pikachu
 	public static String getSIDUPNP() { // 15.08.2015
 		String sSID = "0000000000000000";
-		String xml =
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-		"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n" +
-		"<s:Body><u:CreateUrlSID xmlns:u=\"urn:dslforum-org:service:DeviceConfig:1\">\n" +
-		"</u:CreateUrlSID>\n" +
-		"</s:Body>\n" +
-		"</s:Envelope>";
+		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+				+ "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+				+ "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+				+ "<s:Body><u:CreateUrlSID xmlns:u=\"urn:dslforum-org:service:DeviceConfig:1\">\n"
+				+ "</u:CreateUrlSID>\n" + "</s:Body>\n" + "</s:Envelope>";
 
-		String result = UPNPUtils.getSOAPDataAuth(fbe, protocol + "://" + FBEdit.getInstance().getbox_address() +
-			    URL_SERVICE_CREATEURLSID, URN_SERVICE_CREATEURLSID, xml);
+		String result = UPNPUtils.getSOAPDataAuth(fbe,
+				protocol + "://" + FBEdit.getInstance().getbox_address() + URL_SERVICE_CREATEURLSID,
+				URN_SERVICE_CREATEURLSID, xml);
 
 		Pattern p = Pattern.compile("<NewX_AVM-DE_UrlSID>sid=([^<]*)</NewX_AVM-DE_UrlSID>");
 		Matcher m = p.matcher(result);
-		if(m.find())
+		if (m.find())
 			sSID = m.group(1);
-		//else
-		//	sSID = "0000000000000000";
-		
-		//sSID = result;
-//		Debug.info("Result of DeviceConfig CreateUrlSID: " + result);
+		// else
+		// sSID = "0000000000000000";
+
+		// sSID = result;
+		// Debug.info("Result of DeviceConfig CreateUrlSID: " + result);
 		return sSID;
 	}
 
-	// 27.04.2018 pikachu	
+	// 27.04.2018 pikachu
 	public static String get2FAUPNP() { // 27.04.2018
 		String s2FA = "";
-		String xml =
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-		"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-		"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n" +
-		"<s:Body><u:GetInfo xmlns:u=\"urn:dslforum-org:service:X_AVM-DE_Auth:1\">\n" +
-		"</u:GetInfo>\n" +
-		"</s:Body>\n" +
-		"</s:Envelope>";
+		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+				+ "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+				+ "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
+				+ "<s:Body><u:GetInfo xmlns:u=\"urn:dslforum-org:service:X_AVM-DE_Auth:1\">\n" + "</u:GetInfo>\n"
+				+ "</s:Body>\n" + "</s:Envelope>";
 
-		String result = UPNPUtils.getSOAPDataAuth(fbe, protocol + "://" + FBEdit.getInstance().getbox_address() +
-			    URL_SERVICE_2FA, URN_SERVICE_2FA, xml);
+		String result = UPNPUtils.getSOAPDataAuth(fbe,
+				protocol + "://" + FBEdit.getInstance().getbox_address() + URL_SERVICE_2FA, URN_SERVICE_2FA, xml);
 
 		Pattern p = Pattern.compile("<NewEnabled>([^<]*)</NewEnabled>");
 		Matcher m = p.matcher(result);
-		if(m.find())
+		if (m.find())
 			s2FA = m.group(1);
 		else
 			s2FA = "0";
-		
-		//s2FA = result;
-//		Debug.info("Result of X_AVM-DE_Auth GetInfo NewEnabled: " + result);
+
+		// s2FA = result;
+		// Debug.info("Result of X_AVM-DE_Auth GetInfo NewEnabled: " + result);
 		return s2FA;
 	}
 
