@@ -113,15 +113,15 @@ public class CalcChecksum {
 				return;
 			}
 			if (type == 5) {  // base64 file
-					if (line.indexOf("**** END OF FILE") == 0) {
-						type = 0;
-						return;
-					}
-					String base64 = line.trim().replace("\n", "");
-					byte[] dec = Base64.decodeBase64(base64.getBytes());
-					crc.update(dec);
-
+				if (line.indexOf("**** END OF FILE") == 0) {
+					type = 0;
 					return;
+				}
+				String base64 = line.trim().replace("\n", "");
+				byte[] dec = Base64.decodeBase64(base64.getBytes());
+				crc.update(dec);
+
+				return;
 			}
 			if (type == 3) { // variable (remove "=", add '\0' to the end
 				if (line.indexOf("****") != -1) {
