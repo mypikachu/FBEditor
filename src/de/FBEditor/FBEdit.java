@@ -57,7 +57,9 @@ public class FBEdit extends JFrame implements Runnable
 //	private static final String version = "0.6.9.7e"; // 23.06.2018 "0.6.9.7" Fixed typo error language Italien
 //	private static final String version = "0.6.9.7f"; // 25.06.2018 "0.6.9.7" Fix language Italien
 //	private static final String version = "0.6.9.7g"; // 25.06.2018 "0.6.9.7" language setting manuell
-	private static final String version = "0.6.9.7h"; // 25.06.2018 "0.6.9.7" Program Start Dialog
+//	private static final String version = "0.6.9.7h"; // 25.06.2018 "0.6.9.7" Program Start Dialog
+//	private static final String version = "0.6.9.7i"; // 23.07.2020 "0.6.9.7" With version 7.20 checksum @proghack it
+	private static final String version = "0.6.9.7j"; // 25.07.2020 "0.6.9.7" Fix checksum fuehrende Null Fehlte
 
 	private static final String PROPERTIES_FILE = "FBEditor.properties.xml";
 
@@ -684,8 +686,10 @@ public class FBEdit extends JFrame implements Runnable
 	}
 
 	void updateTitle() {
-		setTitle((new StringBuilder(String.valueOf(progName))).append(" - ")
-				.append(fileName).toString());
+//		setTitle((new StringBuilder(String.valueOf(progName))).append(" - ")
+//				.append(fileName).toString());
+		setTitle((new StringBuilder(String.valueOf(progName))).append(" ").append(version)
+				.append(" - ").append(fileName).toString());
 	}
 
 	void search() {
