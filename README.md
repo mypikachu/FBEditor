@@ -8,4 +8,4 @@ Diskussion
 ----------
 DE - http://www.ip-phone-forum.de/showthread.php?t=79513
 
-IT - https://www.hwupgrade.it/forum/showthread.php?p=45620145
+IT - https://www.hwupgrade.it/forum/showthread.php?t=2856576
